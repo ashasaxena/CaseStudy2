@@ -101,36 +101,29 @@ PD.renamed$NumSon <- (gsub("Male", 1, PD.renamed$NumSon)) #subs a 1 where the wo
 PD.renamed$NumSon <- (gsub("Female", 2, PD.renamed$NumSon)) #subs a 2 where the word Female is listed in NumSon
 PD.renamed$NumSon <- as.integer(PD.renamed$NumSon) #Converts NumSon to an integer.
 PD.renamed$Country <- gsub(0, NA, PD.renamed$Country) #displays Country with 0 as missing data (NA)
-PD.renamed$Country <- gsub("", NA, PD.renamed$Country)#displays Country with no entry as missing data (NA)
-PD.renamed$Country <- as.factor(PD.renamed$Country) #Converts Country to a Factor.
+PD.renamed$Country[PD.renamed$Country == ""] <- NA #replaces all non-entries with NA
+PD.renamed$Occupation[PD.renamed$Occupation == 0] <- NA
+PD.renamed$Occupation[PD.renamed$Occupation == "please specify"] <- NA
+PD.renamed$Occupation[PD.renamed$Occupation == ""] <- NA
 ```
+#2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
 
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 
 ```r
-summary(cars)
+PD.renamed$DPMean=rowMeans(PD.renamed[,15:19])
+PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34])
+PD.renamed$GPMean=rowMeans(PD.renamed[,35:54])
+PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59])
+head(PD.renamed[,62:65])
 ```
 
 ```
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
+##   DPMean  AIPMean GPMean SWLSMean
+## 1    1.4 1.400000   1.60      5.0
+## 2    3.2 2.933333   2.90      3.6
+## 3    3.6 4.400000   3.60      2.6
+## 4    3.0 3.333333   3.20      2.4
+## 5    2.0 1.733333   2.85      3.8
+## 6    2.8 4.333333   4.00      3.2
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-![](CS2_files/figure-html/pressure-1.png)<!-- -->
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
