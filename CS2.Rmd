@@ -58,9 +58,12 @@ PD.renamed$Occupation[PD.renamed$Occupation == ""] <- NA
 
 
 ```{r}
-PD.renamed$DPMean=rowMeans(PD.renamed[,15:19])
-PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34])
-PD.renamed$GPMean=rowMeans(PD.renamed[,35:54])
-PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59])
+PD.renamed$DPMean=rowMeans(PD.renamed[,15:19]) #Creates column for mean of all DP entries in observation.
+PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34]) #Creates column for mean of all AIP entries in observation.
+PD.renamed$GPMean=rowMeans(PD.renamed[,35:54]) #Creates column for mean of all GP entries in observation.
+PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59]) #Creates column for mean of all SWLS entries in observation.
+PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 1) #Round DP, AIP, GP, and SWLS means to 1 digit.
 head(PD.renamed[,62:65])
 ```
+
+
