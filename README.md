@@ -1,1 +1,1 @@
-# CaseStudy2
+# CaseStudy2: Procrastination Study
