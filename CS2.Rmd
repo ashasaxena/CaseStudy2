@@ -84,6 +84,6 @@ HDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
 CountryHDI <- data.frame(Country, HDI)#Convert to data frame
 CountryHDI
 
-## TODO need to fix "world" entry
+## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
