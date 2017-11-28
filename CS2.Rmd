@@ -66,4 +66,24 @@ PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 1) #Round DP, AIP, GP, 
 head(PD.renamed[,62:65])
 ```
 
+##3 SCRAPING
+#3a Scraped Country and HDI
+```{r, echo = TRUE}
+library('rvest') # grab and parse HTML
+
+#Specifying the url for desired website to be scrapped
+url <- 'https://en.wikipedia.org/wiki/List_of_countries_by_Human_Development_Index#Complete_list_of_countries'
+
+webpage <- read_html(url)#Reading the HTML code from the website
+
+#Using XPath selectors to scrap the Country and HDI of first 8 tables
+Country<-webpage%>%html_nodes("h3+ div .wikitable:nth-child(1) td:nth-child(3)")%>%html_text()
+HDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
+
+###  WILL NEED TO FIX "WORLD" ENTRY
+CountryHDI <- data.frame(Country, HDI)#Convert to data frame
+CountryHDI
+
+## TODO need to fix "world" entry
+```
 
