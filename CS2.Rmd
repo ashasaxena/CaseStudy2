@@ -81,7 +81,7 @@ Country<-webpage%>%html_nodes("h3+ div .wikitable:nth-child(1) td:nth-child(3)")
 HDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
 
 ###  WILL NEED TO FIX "WORLD" ENTRY
-CountryHDI <- data.frame(Country, HDI)#Convert to data frame
+CountryHDI <- data.frame(Country, HDI)#Convert to data frame.
 CountryHDI
 
 ## TODO need to fix "world" entry if teams decides it is necessary.
