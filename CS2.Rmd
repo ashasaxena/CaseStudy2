@@ -82,8 +82,50 @@ HDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
 
 ###  WILL NEED TO FIX "WORLD" ENTRY
 CountryHDI <- data.frame(Country, HDI)#Convert to data frame.
+CountryHDI$HDI <- as.numeric(as.character(CountryHDI$HDI)) #Changes to numeric so we can later categorize
+CountryHDI$Country <- as.character(CountryHDI$Country)
+
 CountryHDI
 
 ## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
+#3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.
+
+```{r}
+
+CountryHDI$Category <- cut(CountryHDI$HDI, 
+                       breaks = c(0, 0.55, 0.7, 0.8, 1.0), 
+                       labels = c("Low", "Medium", "High", "VeryHigh"), 
+                       right = FALSE)
+CountryHDI
+write.csv(CountryHDI, file = "CountryHDI.csv") #Creates csv file
+```
+
+
+#3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).
+
+```{r}
+CountryHDI$Country <- gsub(" ", "", CountryHDI$Country, fixed = TRUE) #Removes extra spaces that area not needed.
+CountryHDI$Country <- gsub("(^\\s+)|(\\s+$)", "", CountryHDI$Country) #Removes extra spaces that area not needed.
+PD.renamed$Country <- gsub("(^\\s+)|(\\s+$)", "", PD.renamed$Country) #Removes extra spaces that area not needed.
+PD.renamed$Country <- gsub(" ", "", PD.renamed$Country, fixed = TRUE) #Removes extra spaces that area not needed.
+MergedData <- merge(CountryHDI, PD.renamed, by=c('Country'))
+head(MergedData)
+```
+
+
+
+Misc code
+
+```{r}
+library('plyr') # to call the count command
+f<- count(PD.renamed$Country) #Generates frequency table.  Number of Observations(breweries)/State
+f
+'%nin%' <- Negate('%in%')
+pu <- unique(PD.renamed$Country)
+hu <- unique(CountryHDI$Country)
+a<- pu[pu %nin% hu]  #Finds unique Countries in the procrastination data set that are not in the HDI dataset.  
+a
+
+```
