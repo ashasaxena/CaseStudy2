@@ -54,6 +54,12 @@ PD.renamed$Occupation[PD.renamed$Occupation == 0] <- NA
 PD.renamed$Occupation[PD.renamed$Occupation == "please specify"] <- NA
 PD.renamed$Occupation[PD.renamed$Occupation == ""] <- NA
 PD.renamed$Country[PD.renamed$Country == "Isreal"] <- "Israel"
+PD.renamed$Q1Self[PD.renamed$Q1Self == ""] <- NA
+PD.renamed$Q2Others <- as.character(PD.renamed$Q2Others)
+PD.renamed$Q2Others[PD.renamed$Q2Others == ""] <- NA
+PD.renamed$Q2Others[PD.renamed$Q2Others == "0"] <- NA
+PD.renamed$Q2Others[PD.renamed$Q2Others == "4"] <- NA
+PD.renamed$Q2Others <- as.factor(PD.renamed$Q2Others)
 ```
 #2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
 
@@ -133,4 +139,30 @@ a
 ```
 #Comment:  The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)
 
+#4a Remove all observations where the participant is under age 18. No further analysis of underage individuals is permitted by your client. Remove any other age outliers as you see fit, but be sure to tell what you’re doing and why.
+
+##REMOVED AGE = 80 (OUTLIER) BELOW.
+
+```{r}
+MergedData.filt <- subset(MergedData, Age > 18)
+MergedData.filt.b <- subset(MergedData.filt, Age != 80)
+head(MergedData.filt, n=40)
+library('plyr') # to call the count command
+AgeFreq<- count(MergedData.filt.b$Age) #Generates frequency table.  Number of Observations(breweries)/State
+AgeFreq
+```
+
+#4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
+
+```{r}
+
+
+```
+
+
+#4d. Give the counts (again, pretty table) of how many participants per country in descending order.
+```{r}
+ggplot(data=state_ABV, aes(x=reorder(State, -ABV), y=ABV)) + geom_bar(stat = "identity", fill=ColorOfPlotABV) +  theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("State") + ylab("ABV") + ggtitle("ABV Median by State") 
+
+```
 
