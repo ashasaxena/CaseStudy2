@@ -125,7 +125,7 @@ f
 '%nin%' <- Negate('%in%')
 pu <- unique(PD.renamed$Country)
 hu <- unique(CountryHDI$Country)
-a<- pu[pu %nin% hu]  #Finds unique Countries in the procrastination data set that are not in the HDI dataset.  
+a<- pu[pu %nin% hu]  #Finds unique Countries in the procrastination data set that are not in the HDI dataset. These are the ones that could not be matched up. 
 a
 
 ```
