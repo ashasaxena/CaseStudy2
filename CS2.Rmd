@@ -163,7 +163,7 @@ AgeFreq
 #5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
 ```{r}
 library(ggplot2)
-
+library(RColorBrewer)
 library(dplyr)
 ByCountry<- group_by(MergedData.filt.b, MergedData.filt.b$Country) #Organizes by country
 CountryAIPMean <- summarize(ByCountry,CAIPMean = mean(AIPMean)) # Summarizes by country and finds mean of AIP means of all observations, then assigns to dataframe
@@ -175,8 +175,8 @@ Des <- head(desOrder, n=15) #Assigns 15 entries only
 ggplot(data=Des, aes(x=reorder(Country, -CAIPMean), y=CAIPMean, fill=Category)) +
 geom_bar(stat = "identity")+
 theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
-ylab("AIPMean") + ggtitle("AIP Mean by Top 15 Countries") 
-
+ylab("AIPMean") + ggtitle("AIP Mean by Top 15 Countries")+
+scale_fill_brewer(palette= "Spectral") 
 ```
 
 #5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
@@ -190,5 +190,6 @@ Des.DP <- head(desOrder.DP, n=15) #Assigns 15 entries only
 ggplot(data=Des.DP, aes(x=reorder(Country, -CDPMean), y=CDPMean, fill=Category)) +
 geom_bar(stat = "identity")+
 theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
-ylab("DPMean") + ggtitle("DP Mean by Top 15 Countries") 
+ylab("DPMean") + ggtitle("DP Mean by Top 15 Countries")+
+  scale_fill_brewer(palette= "Spectral") 
 ```
