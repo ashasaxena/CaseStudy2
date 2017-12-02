@@ -207,4 +207,23 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
 ```
 
 
-#5e
+#5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
+
+
+##TODO RELABEL ALL CHARTS WITH MEANINGFULL TITLES.
+```{r}
+ggplot(MergedData.filt.b, aes(x = HDI, y = SWLSMean)) + 
+  geom_point(colour = 'red', size = 1, na.rm=TRUE) + 
+  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
+  theme(plot.title = element_text(hjust = 0.5))
+```
+#5e Barplot
+```{r}
+ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) + 
+  geom_bar(stat = "identity", fill='red', na.rm=TRUE) 
+  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
