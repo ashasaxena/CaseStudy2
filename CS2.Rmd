@@ -60,6 +60,7 @@ PD.renamed$Q2Others[PD.renamed$Q2Others == ""] <- NA
 PD.renamed$Q2Others[PD.renamed$Q2Others == "0"] <- NA
 PD.renamed$Q2Others[PD.renamed$Q2Others == "4"] <- NA
 PD.renamed$Q2Others <- as.factor(PD.renamed$Q2Others)
+PD.renamed$Gender[PD.renamed$Gender == ""] <- NA
 ```
 #2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
 
@@ -91,7 +92,6 @@ HDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
 CountryHDI <- data.frame(Country, HDI)#Convert to data frame.
 CountryHDI$HDI <- as.numeric(as.character(CountryHDI$HDI)) #Changes to numeric so we can later categorize
 CountryHDI$Country <- as.character(CountryHDI$Country)
-
 CountryHDI
 
 ## TODO need to fix "world" entry if teams decides it is necessary.
@@ -128,8 +128,7 @@ Misc code
 
 ```{r}
 library('plyr') # to call the count command
-f<- count(PD.renamed$Country) #Generates frequency table.  Number of Observations(breweries)/State
-f
+
 '%nin%' <- Negate('%in%')
 pu <- unique(PD.renamed$Country)
 hu <- unique(CountryHDI$Country)
@@ -147,9 +146,9 @@ a
 MergedData.filt <- subset(MergedData, Age > 18)
 MergedData.filt.b <- subset(MergedData.filt, Age != 80)
 head(MergedData.filt, n=40)
-library('plyr') # to call the count command
-AgeFreq<- count(MergedData.filt.b$Age) #Generates frequency table.  Number of Observations(breweries)/State
-AgeFreq
+library('dplyr') # to call the count command
+AgeFreq<- count(MergedData.filt.b, Age) #Generates frequency table.  
+AgeFreq #Verifies under 18 and 80 outlier is removed.
 ```
 
 #4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
@@ -195,3 +194,15 @@ ylab("DPMean") + ggtitle("DP Mean by Top 15 Countries")+
   scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+#5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
+
+```{r}
+ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIncome, color=Gender)) + 
+  geom_point(size = 1, na.rm=TRUE) + 
+  labs(title = "Relationship between Income and Age by Gender") + 
+  geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
