@@ -69,7 +69,7 @@ PD.renamed$DPMean=rowMeans(PD.renamed[,15:19]) #Creates column for mean of all D
 PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34]) #Creates column for mean of all AIP entries in observation.
 PD.renamed$GPMean=rowMeans(PD.renamed[,35:54]) #Creates column for mean of all GP entries in observation.
 PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59]) #Creates column for mean of all SWLS entries in observation.
-PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 1) #Round DP, AIP, GP, and SWLS means to 1 digit.
+PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 3) #Round DP, AIP, GP, and SWLS means to 1 digit.
 head(PD.renamed[,62:65])
 ```
 
@@ -160,9 +160,22 @@ AgeFreq
 ```
 
 
-#4d. Give the counts (again, pretty table) of how many participants per country in descending order.
+#5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
 ```{r}
-ggplot(data=state_ABV, aes(x=reorder(State, -ABV), y=ABV)) + geom_bar(stat = "identity", fill=ColorOfPlotABV) +  theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("State") + ylab("ABV") + ggtitle("ABV Median by State") 
+library(ggplot2)
+
+library(dplyr)
+ByCountry<- group_by(MergedData.filt.b, MergedData.filt.b$Country) #Organizes by country
+CountryAIPMean <- summarize(ByCountry,CAIPMean = mean(AIPMean)) # Summarizes by country and finds mean of AIP means of all observations, then assigns to dataframe
+CountryAIPMean <- rename(CountryAIPMean, 'Country' = 'MergedData.filt.b$Country') #rename so we can merge by country
+CountryAIPMean.Cat <- merge(CountryAIPMean, CountryHDI, by=c('Country')) #Attaches Categry to countries
+desOrder<- CountryAIPMean.Cat[order(-CountryAIPMean.Cat$CAIPMean),] #Orders by AIPMean descending
+Des <- head(desOrder, n=15) #Assigns 15 entries only
+
+ggplot(data=Des, aes(x=reorder(Country, -CAIPMean), y=CAIPMean, fill=Category)) +
+geom_bar(stat = "identity")+
+theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
+ylab("AIPMean") + ggtitle("AIP Mean by Top 15 Countries") 
 
 ```
 
