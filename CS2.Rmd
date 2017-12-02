@@ -179,3 +179,16 @@ ylab("AIPMean") + ggtitle("AIP Mean by Top 15 Countries")
 
 ```
 
+#5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
+
+```{r}
+CountryDPMean <- summarize(ByCountry,CDPMean = mean(DPMean)) # Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
+CountryDPMean <- rename(CountryDPMean, 'Country' = 'MergedData.filt.b$Country') #rename so we can merge by country
+CountryDPMean.Cat <- merge(CountryDPMean, CountryHDI, by=c('Country')) #Attaches Categry to countries
+desOrder.DP<- CountryDPMean.Cat[order(-CountryDPMean.Cat$CDPMean),] #Orders by AIPMean descending
+Des.DP <- head(desOrder.DP, n=15) #Assigns 15 entries only
+ggplot(data=Des.DP, aes(x=reorder(Country, -CDPMean), y=CDPMean, fill=Category)) +
+geom_bar(stat = "identity")+
+theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
+ylab("DPMean") + ggtitle("DP Mean by Top 15 Countries") 
+```
