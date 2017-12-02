@@ -200,7 +200,15 @@ PD.renamed$Country &lt;- gsub(0, NA, PD.renamed$Country) #displays Country with 
 PD.renamed$Country[PD.renamed$Country == &quot;&quot;] &lt;- NA #replaces all non-entries with NA
 PD.renamed$Occupation[PD.renamed$Occupation == 0] &lt;- NA
 PD.renamed$Occupation[PD.renamed$Occupation == &quot;please specify&quot;] &lt;- NA
-PD.renamed$Occupation[PD.renamed$Occupation == &quot;&quot;] &lt;- NA</code></pre>
+PD.renamed$Occupation[PD.renamed$Occupation == &quot;&quot;] &lt;- NA
+PD.renamed$Country[PD.renamed$Country == &quot;Isreal&quot;] &lt;- &quot;Israel&quot;
+PD.renamed$Q1Self[PD.renamed$Q1Self == &quot;&quot;] &lt;- NA
+PD.renamed$Q2Others &lt;- as.character(PD.renamed$Q2Others)
+PD.renamed$Q2Others[PD.renamed$Q2Others == &quot;&quot;] &lt;- NA
+PD.renamed$Q2Others[PD.renamed$Q2Others == &quot;0&quot;] &lt;- NA
+PD.renamed$Q2Others[PD.renamed$Q2Others == &quot;4&quot;] &lt;- NA
+PD.renamed$Q2Others &lt;- as.factor(PD.renamed$Q2Others)
+PD.renamed$Gender[PD.renamed$Gender == &quot;&quot;] &lt;- NA</code></pre>
 </div>
 <div id="e.-each-variable-that-starts-with-either-dp-aip-gp-or-swls-is-an-individual-item-on-a-scale.-for-example-dp-1-through-dp-5-are-five-different-questions-on-the-decision-procrastination-scale.-ive-reverse-scored-them-for-you-already-but-you-should-create-a-new-column-for-each-of-them-with-their-mean.-to-clarify-youll-need-a-dpmean-column-an-aipmean-column-a-gpmean-column-and-a-swlsmean-column.-this-represents-the-individuals-average-decisional-procrastination-dp-procrastination-behavior-aip-generalized-procrastination-gp-and-life-satisfaction-swls." class="section level1">
 <h1>2e. Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).</h1>
@@ -208,15 +216,15 @@ PD.renamed$Occupation[PD.renamed$Occupation == &quot;&quot;] &lt;- NA</code></pr
 PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34]) #Creates column for mean of all AIP entries in observation.
 PD.renamed$GPMean=rowMeans(PD.renamed[,35:54]) #Creates column for mean of all GP entries in observation.
 PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59]) #Creates column for mean of all SWLS entries in observation.
-PD.renamed[,62:65] &lt;- round(PD.renamed[,62:65], digits = 1) #Round DP, AIP, GP, and SWLS means to 1 digit.
+PD.renamed[,62:65] &lt;- round(PD.renamed[,62:65], digits = 3) #Round DP, AIP, GP, and SWLS means to 1 digit.
 head(PD.renamed[,62:65])</code></pre>
 <pre><code>##   DPMean AIPMean GPMean SWLSMean
-## 1    1.4     1.4    1.6      5.0
-## 2    3.2     2.9    2.9      3.6
-## 3    3.6     4.4    3.6      2.6
-## 4    3.0     3.3    3.2      2.4
-## 5    2.0     1.7    2.8      3.8
-## 6    2.8     4.3    4.0      3.2</code></pre>
+## 1    1.4   1.400   1.60      5.0
+## 2    3.2   2.933   2.90      3.6
+## 3    3.6   4.400   3.60      2.6
+## 4    3.0   3.333   3.20      2.4
+## 5    2.0   1.733   2.85      3.8
+## 6    2.8   4.333   4.00      3.2</code></pre>
 <div id="scraping" class="section level2">
 <h2>3 SCRAPING</h2>
 </div>
@@ -235,7 +243,9 @@ Country&lt;-webpage%&gt;%html_nodes(&quot;h3+ div .wikitable:nth-child(1) td:nth
 HDI&lt;-webpage%&gt;%html_nodes(&quot;h3+ div td:nth-child(4)&quot;)%&gt;%html_text()
 
 ###  WILL NEED TO FIX &quot;WORLD&quot; ENTRY
-CountryHDI &lt;- data.frame(Country, HDI)#Convert to data frame
+CountryHDI &lt;- data.frame(Country, HDI)#Convert to data frame.
+CountryHDI$HDI &lt;- as.numeric(as.character(CountryHDI$HDI)) #Changes to numeric so we can later categorize
+CountryHDI$Country &lt;- as.character(CountryHDI$Country)
 CountryHDI</code></pre>
 <pre><code>##                                Country   HDI
 ## 1                               Norway 0.949
@@ -427,7 +437,654 @@ CountryHDI</code></pre>
 ## 187                               Chad 0.396
 ## 188                              Niger 0.353
 ## 189           Central African Republic 0.352</code></pre>
-<pre class="r"><code>## TODO need to fix &quot;world&quot; entry</code></pre>
+<pre class="r"><code>## TODO need to fix &quot;world&quot; entry if teams decides it is necessary.</code></pre>
+</div>
+<div id="b.-create-a-new-column-for-this-final-scraped-table-which-categories-the-countries-like-the-original-page-very-high-human-development-high-human-development-medium-human-development-low-human-development.-after-these-categories-output-a-csv-file-of-this-table-to-your-repository." class="section level1">
+<h1>3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.</h1>
+<pre class="r"><code>CountryHDI$Category &lt;- cut(CountryHDI$HDI, 
+                       breaks = c(0, 0.55, 0.7, 0.8, 1.0), 
+                       labels = c(&quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;, &quot;VeryHigh&quot;), 
+                       right = FALSE)
+CountryHDI</code></pre>
+<pre><code>##                                Country   HDI Category
+## 1                               Norway 0.949 VeryHigh
+## 2                            Australia 0.939 VeryHigh
+## 3                          Switzerland 0.939 VeryHigh
+## 4                              Germany 0.926 VeryHigh
+## 5                              Denmark 0.925 VeryHigh
+## 6                            Singapore 0.925 VeryHigh
+## 7                          Netherlands 0.924 VeryHigh
+## 8                              Ireland 0.923 VeryHigh
+## 9                              Iceland 0.921 VeryHigh
+## 10                              Canada 0.920 VeryHigh
+## 11                       United States 0.920 VeryHigh
+## 12                           Hong Kong 0.917 VeryHigh
+## 13                         New Zealand 0.915 VeryHigh
+## 14                              Sweden 0.913 VeryHigh
+## 15                       Liechtenstein 0.912 VeryHigh
+## 16                      United Kingdom 0.909 VeryHigh
+## 17                               Japan 0.903 VeryHigh
+## 18                         South Korea 0.901 VeryHigh
+## 19                              Israel 0.899 VeryHigh
+## 20                          Luxembourg 0.898 VeryHigh
+## 21                              France 0.897 VeryHigh
+## 22                             Belgium 0.896 VeryHigh
+## 23                             Finland 0.895 VeryHigh
+## 24                             Austria 0.893 VeryHigh
+## 25                            Slovenia 0.890 VeryHigh
+## 26                               Italy 0.887 VeryHigh
+## 27                               Spain 0.884 VeryHigh
+## 28                      Czech Republic 0.878 VeryHigh
+## 29                              Greece 0.866 VeryHigh
+## 30                              Brunei 0.865 VeryHigh
+## 31                             Estonia 0.865 VeryHigh
+## 32                             Andorra 0.858 VeryHigh
+## 33                              Cyprus 0.856 VeryHigh
+## 34                               Malta 0.856 VeryHigh
+## 35                               Qatar 0.856 VeryHigh
+## 36                              Poland 0.855 VeryHigh
+## 37                           Lithuania 0.848 VeryHigh
+## 38                               Chile 0.847 VeryHigh
+## 39                        Saudi Arabia 0.847 VeryHigh
+## 40                            Slovakia 0.845 VeryHigh
+## 41                            Portugal 0.843 VeryHigh
+## 42                United Arab Emirates 0.840 VeryHigh
+## 43                             Hungary 0.836 VeryHigh
+## 44                              Latvia 0.830 VeryHigh
+## 45                           Argentina 0.827 VeryHigh
+## 46                             Croatia 0.827 VeryHigh
+## 47                             Bahrain 0.824 VeryHigh
+## 48                          Montenegro 0.807 VeryHigh
+## 49                              Russia 0.804 VeryHigh
+## 50                             Romania 0.802 VeryHigh
+## 51                              Kuwait 0.800 VeryHigh
+## 52                             Belarus 0.796     High
+## 53                                Oman 0.796     High
+## 54                            Barbados 0.795     High
+## 55                             Uruguay 0.795     High
+## 56                            Bulgaria 0.794     High
+## 57                          Kazakhstan 0.794     High
+## 58                             Bahamas 0.792     High
+## 59                            Malaysia 0.789     High
+## 60                               Palau 0.788     High
+## 61                              Panama 0.788     High
+## 62                 Antigua and Barbuda 0.786     High
+## 63                          Seychelles 0.782     High
+## 64                           Mauritius 0.781     High
+## 65                 Trinidad and Tobago 0.780     High
+## 66                          Costa Rica 0.776     High
+## 67                              Serbia 0.776     High
+## 68                                Cuba 0.775     High
+## 69                                Iran 0.774     High
+## 70                             Georgia 0.769     High
+## 71                              Turkey 0.767     High
+## 72                           Venezuela 0.767     High
+## 73                           Sri Lanka 0.766     High
+## 74               Saint Kitts and Nevis 0.765     High
+## 75                             Albania 0.764     High
+## 76                             Lebanon 0.763     High
+## 77                              Mexico 0.762     High
+## 78                          Azerbaijan 0.759     High
+## 79                              Brazil 0.754     High
+## 80                             Grenada 0.754     High
+## 81              Bosnia and Herzegovina 0.750     High
+## 82                           Macedonia 0.748     High
+## 83                             Algeria 0.745     High
+## 84                             Armenia 0.743     High
+## 85                             Ukraine 0.743     High
+## 86                              Jordan 0.741     High
+## 87                                Peru 0.740     High
+## 88                            Thailand 0.740     High
+## 89                             Ecuador 0.739     High
+## 90                               China 0.738     High
+## 91                                Fiji 0.736     High
+## 92                            Mongolia 0.735     High
+## 93                         Saint Lucia 0.735     High
+## 94                             Jamaica 0.730     High
+## 95                            Colombia 0.727     High
+## 96                            Dominica 0.726     High
+## 97                            Suriname 0.725     High
+## 98                             Tunisia 0.725     High
+## 99                  Dominican Republic 0.722     High
+## 100   Saint Vincent and the Grenadines 0.722     High
+## 101                              Tonga 0.721     High
+## 102                              World 0.717     High
+## 103                              Libya 0.716     High
+## 104                             Belize 0.706     High
+## 105                              Samoa 0.704     High
+## 106                           Maldives 0.701     High
+## 107                         Uzbekistan 0.701     High
+## 108                            Moldova 0.699   Medium
+## 109                           Botswana 0.698   Medium
+## 110                              Gabon 0.697   Medium
+## 111                           Paraguay 0.693   Medium
+## 112                              Egypt 0.691   Medium
+## 113                       Turkmenistan 0.691   Medium
+## 114                          Indonesia 0.689   Medium
+## 115                          Palestine 0.684   Medium
+## 116                            Vietnam 0.683   Medium
+## 117                        Philippines 0.682   Medium
+## 118                        El Salvador 0.680   Medium
+## 119                            Bolivia 0.674   Medium
+## 120                       South Africa 0.666   Medium
+## 121                         Kyrgyzstan 0.664   Medium
+## 122                               Iraq 0.649   Medium
+## 123                         Cape Verde 0.648   Medium
+## 124                            Morocco 0.647   Medium
+## 125                          Nicaragua 0.645   Medium
+## 126                          Guatemala 0.640   Medium
+## 127                            Namibia 0.640   Medium
+## 128                             Guyana 0.638   Medium
+## 129                         Micronesia 0.638   Medium
+## 130                         Tajikistan 0.627   Medium
+## 131                           Honduras 0.625   Medium
+## 132                              India 0.624   Medium
+## 133                             Bhutan 0.607   Medium
+## 134                        Timor Leste 0.605   Medium
+## 135                            Vanuatu 0.597   Medium
+## 136             Congo, Republic of the 0.592   Medium
+## 137                  Equatorial Guinea 0.592   Medium
+## 138                           Kiribati 0.588   Medium
+## 139                               Laos 0.586   Medium
+## 140                         Bangladesh 0.579   Medium
+## 141                              Ghana 0.579   Medium
+## 142                             Zambia 0.579   Medium
+## 143              São Tomé and Príncipe 0.574   Medium
+## 144                           Cambodia 0.563   Medium
+## 145                              Nepal 0.558   Medium
+## 146                            Myanmar 0.556   Medium
+## 147                              Kenya 0.555   Medium
+## 148                           Pakistan 0.550   Medium
+## 149                          Swaziland 0.541      Low
+## 150                              Syria 0.536      Low
+## 151                             Angola 0.533      Low
+## 152                           Tanzania 0.531      Low
+## 153                            Nigeria 0.527      Low
+## 154                           Cameroon 0.518      Low
+## 155                   Papua New Guinea 0.516      Low
+## 156                           Zimbabwe 0.516      Low
+## 157                    Solomon Islands 0.515      Low
+## 158                         Mauritania 0.513      Low
+## 159                         Madagascar 0.512      Low
+## 160                             Rwanda 0.498      Low
+## 161                            Comoros 0.497      Low
+## 162                            Lesotho 0.497      Low
+## 163                            Senegal 0.494      Low
+## 164                              Haiti 0.493      Low
+## 165                             Uganda 0.493      Low
+## 166                              Sudan 0.490      Low
+## 167                               Togo 0.487      Low
+## 168                              Benin 0.485      Low
+## 169                              Yemen 0.482      Low
+## 170                        Afghanistan 0.479      Low
+## 171                             Malawi 0.476      Low
+## 172                      Côte d'Ivoire 0.474      Low
+## 173                           Djibouti 0.473      Low
+## 174                             Gambia 0.452      Low
+## 175                           Ethiopia 0.448      Low
+## 176                               Mali 0.442      Low
+## 177  Congo, Democratic Republic of the 0.435      Low
+## 178                            Liberia 0.427      Low
+## 179                      Guinea Bissau 0.424      Low
+## 180                            Eritrea 0.420      Low
+## 181                       Sierra Leone 0.420      Low
+## 182                         Mozambique 0.418      Low
+## 183                        South Sudan 0.418      Low
+## 184                             Guinea 0.414      Low
+## 185                            Burundi 0.404      Low
+## 186                       Burkina Faso 0.402      Low
+## 187                               Chad 0.396      Low
+## 188                              Niger 0.353      Low
+## 189           Central African Republic 0.352      Low</code></pre>
+<pre class="r"><code>write.csv(CountryHDI, file = &quot;CountryHDI.csv&quot;) #Creates csv file</code></pre>
+</div>
+<div id="c-merge-this-data-frame-to-the-country-of-residence-column-of-procrastination.csv-so-that-your-data-now-has-an-hdi-column-and-hdi-categories-very-high-human-development-etc.." class="section level1">
+<h1>3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).</h1>
+<pre class="r"><code>CountryHDI$Country &lt;- gsub(&quot; &quot;, &quot;&quot;, CountryHDI$Country, fixed = TRUE) #Removes extra spaces that area not needed.
+CountryHDI$Country &lt;- gsub(&quot;(^\\s+)|(\\s+$)&quot;, &quot;&quot;, CountryHDI$Country) #Removes extra spaces that area not needed.
+PD.renamed$Country &lt;- gsub(&quot;(^\\s+)|(\\s+$)&quot;, &quot;&quot;, PD.renamed$Country) #Removes extra spaces that area not needed.
+PD.renamed$Country &lt;- gsub(&quot; &quot;, &quot;&quot;, PD.renamed$Country, fixed = TRUE) #Removes extra spaces that area not needed.
+CountryHDI$Country[CountryHDI$Country == &quot;AntiguaandBarbuda&quot;] &lt;- &quot;Antigua&quot;
+MergedData &lt;- merge(CountryHDI, PD.renamed, by=c('Country'))
+head(MergedData)</code></pre>
+<pre><code>##       Country   HDI Category Age Gender     Kids Education WorkStatus
+## 1 Afghanistan 0.479      Low  55   Male  No Kids       deg  full-time
+## 2 Afghanistan 0.479      Low  55 Female Yes Kids       deg  full-time
+## 3 Afghanistan 0.479      Low  80 Female  No Kids     grade unemployed
+## 4 Afghanistan 0.479      Low  55   Male Yes Kids        ma  full-time
+## 5     Albania 0.764     High  45 Female  No Kids     ltuni  full-time
+## 6     Albania 0.764     High  68   Male Yes Kids       deg  part-time
+##   AnnualIncome       Occupation Years Months    Community   Status NumSon
+## 1        87500             &lt;NA&gt;     0      6   Large Town  Married      0
+## 2        10000             &lt;NA&gt;     7      0      Village Divorced      4
+## 3        10000             &lt;NA&gt;     0      0 Medium-Sized   Single      0
+## 4       150000             &lt;NA&gt;     0      0   Large Town  Married      4
+## 5       150000             &lt;NA&gt;     0      0   Large Town   Single      0
+## 6        87500 Media Consultant     4      0   Large-City Divorced      0
+##   NumDaught DP1 DP2 DP3 DP4 DP5 AIP1 AIP2 AIP3 AIP4 AIP5 AIP6 AIP7 AIP8
+## 1         0   3   3   3   4   3    3    2    2    2    3    2    3    3
+## 2         0   4   3   4   3   2    1    2    1    4    3    5    4    4
+## 3         0   2   3   2   3   5    2    2    3    4    2    2    2    1
+## 4         2   4   4   4   3   3    3    4    5    4    3    4    3    5
+## 5         0   3   3   5   3   3    3    1    2    1    2    2    2    2
+## 6         2   4   3   2   2   1    4    1    5    1    2    1    1    3
+##   AIP9 AIP10 AIP11 AIP12 AIP13 AIP14 AIP15 GP1 GP2 GP3 GP4 GP5 GP6 GP7 GP8
+## 1    2     3     4     2     4     2     3   4   2   4   3   3   3   3   4
+## 2    3     3     3     4     3     3     3   3   2   2   5   3   3   3   5
+## 3    1     3     5     4     3     3     4   4   4   1   4   4   4   4   3
+## 4    4     3     5     5     1     5     4   4   4   5   3   1   3   4   4
+## 5    1     2     3     2     2     1     5   5   3   2   2   5   4   5   5
+## 6    2     3     3     1     3     1     5   4   1   2   2   3   2   2   2
+##   GP9 GP10 GP11 GP12 GP13 GP14 GP15 GP16 GP17 GP18 GP19 GP20 SWLS1 SWLS2
+## 1   4    2    2    3    2    4    3    4    3    3    4    4     3     2
+## 2   3    1    2    3    1    1    3    3    3    4    3    3     1     1
+## 3   2    2    3    3    2    3    2    4    4    4    3    4     2     4
+## 4   4    4    4    4    3    4    4    4    4    4    3    4     3     3
+## 5   5    1    3    4    5    5    5    4    3    4    4    4     3     3
+## 6   4    1    2    4    4    4    4    4    4    3    4    4     3     4
+##   SWLS3 SWLS4 SWLS5 Q1Self Q2Others DPMean AIPMean GPMean SWLSMean
+## 1     2     3     2    yes       no    3.2   2.667    3.2      2.4
+## 2     1     3     1     no      yes    3.2   3.067    2.8      1.4
+## 3     3     3     2    yes       no    3.0   2.733    3.2      2.8
+## 4     2     2     2    yes      yes    3.6   3.867    3.7      2.4
+## 5     3     4     2    yes       no    3.4   2.067    3.9      3.0
+## 6     3     5     4    yes       no    2.4   2.400    3.0      3.8</code></pre>
+<p>Misc code</p>
+<pre class="r"><code>library('plyr') # to call the count command
+
+'%nin%' &lt;- Negate('%in%')
+pu &lt;- unique(PD.renamed$Country)
+hu &lt;- unique(CountryHDI$Country)
+a&lt;- pu[pu %nin% hu]  #Finds unique Countries in the procrastination data set that are not in the HDI dataset. These are the ones that could not be matched up. 
+a</code></pre>
+<pre><code>## [1] &quot;Guam&quot;       &quot;PuertoRico&quot; &quot;Bermuda&quot;    &quot;Taiwan&quot;     &quot;Macao&quot;     
+## [6] &quot;Yugoslavia&quot; &quot;Columbia&quot;   NA</code></pre>
+</div>
+<div id="comment-the-above-coutry-names-were-either-not-in-the-procrastination-set-not-listed-na-or-associated-with-another-country-ie-taiwanchina" class="section level1">
+<h1>Comment: The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)</h1>
+</div>
+<div id="a-remove-all-observations-where-the-participant-is-under-age-18.-no-further-analysis-of-underage-individuals-is-permitted-by-your-client.-remove-any-other-age-outliers-as-you-see-fit-but-be-sure-to-tell-what-youre-doing-and-why." class="section level1">
+<h1>4a Remove all observations where the participant is under age 18. No further analysis of underage individuals is permitted by your client. Remove any other age outliers as you see fit, but be sure to tell what you’re doing and why.</h1>
+<div id="removed-age-80-outlier-below." class="section level2">
+<h2>REMOVED AGE = 80 (OUTLIER) BELOW.</h2>
+<pre class="r"><code>MergedData.filt &lt;- subset(MergedData, Age &gt; 18)
+MergedData.filt.b &lt;- subset(MergedData.filt, Age != 80)
+head(MergedData.filt, n=40)</code></pre>
+<pre><code>##        Country   HDI Category Age Gender     Kids Education WorkStatus
+## 1  Afghanistan 0.479      Low  55   Male  No Kids       deg  full-time
+## 2  Afghanistan 0.479      Low  55 Female Yes Kids       deg  full-time
+## 3  Afghanistan 0.479      Low  80 Female  No Kids     grade unemployed
+## 4  Afghanistan 0.479      Low  55   Male Yes Kids        ma  full-time
+## 5      Albania 0.764     High  45 Female  No Kids     ltuni  full-time
+## 6      Albania 0.764     High  68   Male Yes Kids       deg  part-time
+## 7      Algeria 0.745     High  55 Female Yes Kids       dip  full-time
+## 8      Algeria 0.745     High  45   Male Yes Kids        ma  full-time
+## 9      Algeria 0.745     High  38 Female  No Kids       deg  full-time
+## 10     Andorra 0.858 VeryHigh  80   Male  No Kids        ma    retired
+## 11     Andorra 0.858 VeryHigh  55   Male Yes Kids        ma  full-time
+## 12     Antigua 0.786     High  32   Male Yes Kids       dip  full-time
+## 13   Argentina 0.827 VeryHigh  68   Male Yes Kids            part-time
+## 15   Argentina 0.827 VeryHigh  32 Female  No Kids       deg  full-time
+## 16   Argentina 0.827 VeryHigh  45   Male Yes Kids       deg  full-time
+## 17   Australia 0.939 VeryHigh  32   Male  No Kids     ltuni  full-time
+## 19   Australia 0.939 VeryHigh  28   Male  No Kids       deg    student
+## 20   Australia 0.939 VeryHigh  38   Male  No Kids      high  full-time
+## 21   Australia 0.939 VeryHigh  55   Male  No Kids    lthigh unemployed
+## 22   Australia 0.939 VeryHigh  45   Male Yes Kids       deg  full-time
+## 23   Australia 0.939 VeryHigh  28   Male  No Kids     ltuni  part-time
+## 24   Australia 0.939 VeryHigh  28 Female  No Kids     ltuni  full-time
+## 25   Australia 0.939 VeryHigh  55 Female Yes Kids        ma    student
+## 26   Australia 0.939 VeryHigh  20 Female  No Kids     ltuni    student
+## 27   Australia 0.939 VeryHigh  55   Male Yes Kids       phd  full-time
+## 28   Australia 0.939 VeryHigh  55   Male Yes Kids        ma  full-time
+## 29   Australia 0.939 VeryHigh  23 Female  No Kids       deg    student
+## 30   Australia 0.939 VeryHigh  32 Female Yes Kids       phd    student
+## 31   Australia 0.939 VeryHigh  55 Female  No Kids       deg  full-time
+## 32   Australia 0.939 VeryHigh  38   Male Yes Kids       dip  full-time
+## 33   Australia 0.939 VeryHigh  19   Male  No Kids     ltuni    student
+## 34   Australia 0.939 VeryHigh  28 Female  No Kids        ma  full-time
+## 35   Australia 0.939 VeryHigh  22   Male  No Kids     ltuni    student
+## 36   Australia 0.939 VeryHigh  32   Male  No Kids       deg  full-time
+## 37   Australia 0.939 VeryHigh  32 Female  No Kids        ma  full-time
+## 38   Australia 0.939 VeryHigh  28   Male Yes Kids        ma  full-time
+## 39   Australia 0.939 VeryHigh  28   Male  No Kids       deg    student
+## 40   Australia 0.939 VeryHigh  38   Male  No Kids       deg unemployed
+## 41   Australia 0.939 VeryHigh  45   Male Yes Kids      high  full-time
+## 42   Australia 0.939 VeryHigh  28 Female  No Kids       deg  full-time
+##    AnnualIncome                          Occupation Years Months
+## 1         87500                                &lt;NA&gt;     0      6
+## 2         10000                                &lt;NA&gt;     7      0
+## 3         10000                                &lt;NA&gt;     0      0
+## 4        150000                                &lt;NA&gt;     0      0
+## 5        150000                                &lt;NA&gt;     0      0
+## 6         87500                    Media Consultant     4      0
+## 7         55000 Assoc. Governmental Program Analyst    28      0
+## 8         35000                                &lt;NA&gt;    10      0
+## 9         67500                                &lt;NA&gt;     9      6
+## 10        45000                             retired    17      0
+## 11       250000                             Finance    23      0
+## 12        25000                                &lt;NA&gt;     6      0
+## 13       150000                   BUSINESS CONSULTA    12      0
+## 15        67500                             manager     3      0
+## 16        55000                                &lt;NA&gt;     7      0
+## 17        45000                Service co-ordinator     0      7
+## 19        15000                                &lt;NA&gt;     0      3
+## 20       150000                                &lt;NA&gt;     6      3
+## 21        15000                                &lt;NA&gt;     6      6
+## 22        55000                   Technical officer     1      9
+## 23        15000                                &lt;NA&gt;     0      6
+## 24        55000                                &lt;NA&gt;     2      2
+## 25        15000                                &lt;NA&gt;     2      2
+## 26        10000                                &lt;NA&gt;     2      0
+## 27        55000                                &lt;NA&gt;     0      0
+## 28        35000                                &lt;NA&gt;     3      5
+## 29        15000                                &lt;NA&gt;     5      6
+## 30        45000                                &lt;NA&gt;     4      6
+## 31        15000                                &lt;NA&gt;     6      0
+## 32        45000                                &lt;NA&gt;     8      0
+## 33        15000                                &lt;NA&gt;     2      4
+## 34        55000                                &lt;NA&gt;     1      0
+## 35        10000                                &lt;NA&gt;     2      0
+## 36        87500                                &lt;NA&gt;     2      0
+## 37        67500                                &lt;NA&gt;     3      0
+## 38        55000                                &lt;NA&gt;     7      0
+## 39        10000                                &lt;NA&gt;     0      0
+## 40        10000                                &lt;NA&gt;     5      0
+## 41       150000                                &lt;NA&gt;     1      0
+## 42        55000                                &lt;NA&gt;     1      4
+##        Community   Status NumSon NumDaught DP1 DP2 DP3 DP4 DP5 AIP1 AIP2
+## 1     Large Town  Married      0         0   3   3   3   4   3    3    2
+## 2        Village Divorced      4         0   4   3   4   3   2    1    2
+## 3   Medium-Sized   Single      0         0   2   3   2   3   5    2    2
+## 4     Large Town  Married      4         2   4   4   4   3   3    3    4
+## 5     Large Town   Single      0         0   3   3   5   3   3    3    1
+## 6     Large-City Divorced      0         2   4   3   2   2   1    4    1
+## 7     Large-City  Married      0         4   3   2   1   1   1    2    1
+## 8        Village  Married      2         0   4   4   5   4   4    4    1
+## 9        Village  Married      0         0   4   4   5   5   4    1    2
+## 10  Medium-Sized   Single      0         0   2   1   1   2   1    1    1
+## 11    Large-City  Married      0         5   2   2   2   2   2    1    2
+## 12 Rural/Country Divorced      2         0   3   3   3   3   3    3    3
+## 13    Small Town  Married      3         0   3   3   3   3   3    1    2
+## 15    Large-City   Single      0         0   2   1   2   2   2    1    1
+## 16       Village  Married      1         2   4   4   4   3   2    1    1
+## 17    Large-City   Single      0         0   4   4   4   3   3    4    5
+## 19    Small Town  Married      0         0   3   3   3   2   2    2    3
+## 20       Village   Single      0         0   2   3   2   2   2    1    1
+## 21 Rural/Country Divorced      0         0   3   3   2   3   3    1    1
+## 22    Large-City  Married      2         0   3   3   3   1   1    1    1
+## 23       Village   Single      0         0   5   5   5   5   5    5    3
+## 24       Village   Single      0         0   4   4   4   5   5    2    4
+## 25  Medium-Sized  Married      0         2   3   2   2   1   1    1    1
+## 26       Village   Single      0         0   1   3   2   2   2    2    2
+## 27       Village  Married      1         2   3   2   3   2   1    1    1
+## 28                Married      0         2   4   4   4   4   4    2    1
+## 29       Village   Single      0         0   4   5   4   2   2    5    3
+## 30       Village  Married      0         1   3   3   5   5   5    3    1
+## 31       Village   Single      0         0   3   1   2   2   1    2    1
+## 32 Rural/Country  Married      2         0   4   2   2   1   2    2    1
+## 33       Village   Single      0         0   4   3   4   3   3    1    1
+## 34       Village   Single      0         0   2   3   3   3   3    2    3
+## 35       Village   Single      0         0   2   5   3   3   4    4    4
+## 36       Village   Single      0         0   4   4   4   3   3    3    2
+## 37 Rural/Country   Single      0         0   3   4   3   3   3    5    2
+## 38       Village  Married      0         1   2   3   2   1   1    1    1
+## 39       Village   Single      0         0   5   5   3   2   1    1    1
+## 40       Village  Married      0         0   4   4   5   5   5    1    1
+## 41 Rural/Country  Married      1         2   1   2   1   1   1    1    1
+## 42             8               0         0   2   2   3   2   2    2    1
+##    AIP3 AIP4 AIP5 AIP6 AIP7 AIP8 AIP9 AIP10 AIP11 AIP12 AIP13 AIP14 AIP15
+## 1     2    2    3    2    3    3    2     3     4     2     4     2     3
+## 2     1    4    3    5    4    4    3     3     3     4     3     3     3
+## 3     3    4    2    2    2    1    1     3     5     4     3     3     4
+## 4     5    4    3    4    3    5    4     3     5     5     1     5     4
+## 5     2    1    2    2    2    2    1     2     3     2     2     1     5
+## 6     5    1    2    1    1    3    2     3     3     1     3     1     5
+## 7     1    3    3    5    1    2    3     3     1     1     1     2     3
+## 8     4    1    3    3    4    2    3     3     3     1     5     3     3
+## 9     5    4    2    3    3    3    1     3     5     3     2     3     3
+## 10    3    2    1    1    1    1    3     1     2     2     1     1     1
+## 11    3    2    2    2    2    3    2     2     4     4     3     2     2
+## 12    3    3    3    3    3    3    3     3     3     3     3     3     3
+## 13    4    4    3    2    3    3    3     3     1     3     2     3     3
+## 15    1    1    5    4    1    2    2     2     3     1     2     1     1
+## 16    3    4    3    5    5    3    4     3     2     3     3     3     2
+## 17    3    5    3    4    5    4    3     4     4     5     4     4     4
+## 19    4    3    4    5    5    4    3     3     3     3     3     3     3
+## 20    2    2    3    2    1    1    2     2     2     1     3     1     2
+## 21    1    2    3    2    2    3    3     3     1     1     2     1     3
+## 22    2    3    2    1    1    3    1     2     1     3     2     2     2
+## 23    3    4    5    5    4    5    5     5     5     5     5     4     5
+## 24    3    5    4    5    5    4    5     5     3     5     4     5     5
+## 25    3    3    2    1    1    3    1     2     3     3     2     1     1
+## 26    1    3    1    1    1    4    1     2     2     2     5     2     5
+## 27    3    4    3    1    1    3    4     3     4     2     3     1     2
+## 28    3    2    3    3    3    4    3     3     4     2     4     1     2
+## 29    5    4    5    5    5    4    5     5     2     5     5     3     5
+## 30    3    2    5    4    3    5    4     5     3     3     3     1     4
+## 31    2    1    2    3    3    2    1     3     3     1     4     1     2
+## 32    5    4    2    4    2    4    3     4     2     2     3     2     5
+## 33    2    3    2    4    5    4    3     4     3     3     4     4     5
+## 34    2    4    3    5    4    3    4     4     2     4     4     3     4
+## 35    5    1    5    4    5    4    5     5     4     3     5     4     4
+## 36    5    3    5    4    5    4    5     5     5     3     4     3     4
+## 37    3    3    5    5    4    4    5     4     4     4     4     3     4
+## 38    3    2    2    2    1    1    1     3     3     2     2     3     2
+## 39    2    1    5    5    5    5    5     5     4     1     4     1     5
+## 40    2    2    3    3    5    3    2     4     4     1     4     1     3
+## 41    1    1    1    1    1    1    1     1     1     1     1     1     1
+## 42    2    2    2    2    2    2    2     2     2     2     3     2     3
+##    GP1 GP2 GP3 GP4 GP5 GP6 GP7 GP8 GP9 GP10 GP11 GP12 GP13 GP14 GP15 GP16
+## 1    4   2   4   3   3   3   3   4   4    2    2    3    2    4    3    4
+## 2    3   2   2   5   3   3   3   5   3    1    2    3    1    1    3    3
+## 3    4   4   1   4   4   4   4   3   2    2    3    3    2    3    2    4
+## 4    4   4   5   3   1   3   4   4   4    4    4    4    3    4    4    4
+## 5    5   3   2   2   5   4   5   5   5    1    3    4    5    5    5    4
+## 6    4   1   2   2   3   2   2   2   4    1    2    4    4    4    4    4
+## 7    3   1   1   3   4   1   2   2   3    1    3    3    2    2    3    3
+## 8    3   2   4   3   3   4   4   2   4    3    2    4    4    2    4    4
+## 9    4   2   4   3   4   5   2   5   3    1    5    3    1    3    4    5
+## 10   3   3   1   1   1   1   2   1   3    1    5    3    2    2    1    4
+## 11   3   2   2   2   2   2   3   3   3    2    2    3    2    2    2    3
+## 12   2   2   4   4   2   4   2   4   2    2    3    3    4    4    4    2
+## 13   3   3   3   1   2   1   2   2   3    4    2    3    2    4    3    5
+## 15   3   2   1   4   3   2   2   2   3    5    4    1    1    1    2    2
+## 16   4   3   1   3   2   2   2   3   4    2    2    4    3    3    4    3
+## 17   5   4   4   5   4   5   4   4   4    3    4    4    4    4    3    4
+## 19   3   1   2   5   3   3   3   3   4    3    3    3    3    3    4    2
+## 20   2   2   2   2   2   2   2   3   2    1    1    2    1    1    1    3
+## 21   4   2   2   3   2   2   4   3   4    1    2    4    1    1    3    2
+## 22   2   2   4   1   1   1   1   2   4    1    3    2    1    3    3    3
+## 23   5   2   5   5   5   5   5   5   3    2    1    5    4    5    5    5
+## 24   5   4   4   5   4   5   4   4   4    4    5    3    1    3    4    4
+## 25   2   1   2   2   2   2   1   2   2    2    3    2    2    3    3    2
+## 26   3   1   2   5   5   2   5   2   5    1    3    5    2    2    2    5
+## 27   2   1   2   4   3   2   3   2   3    1    5    1    1    2    3    3
+## 28   4   3   4   4   4   2   4   4   4    2    2    4    3    4    3    5
+## 29   4   4   3   5   5   2   4   3   5    5    4    5    5    5    5    5
+## 30   4   3   1   2   3   1   5   5   5    1    3    5    3    3    5    1
+## 31   3   1   1   1   3   1   3   2   3    1    2    3    2    3    3    2
+## 32   5   2   3   1   2   3   4   2   4    3    2    5    3    3    4    4
+## 33   4   3   4   5   2   2   4   4   4    2    4    4    1    4    4    4
+## 34   4   3   2   2   2   3   4   3   4    3    3    4    2    2    4    2
+## 35   4   5   2   5   4   1   5   5   5    5    4    4    4    4    5    1
+## 36   4   4   4   3   4   4   4   4   4    4    3    4    3    4    4    5
+## 37   4   4   4   4   4   4   4   3   5    4    2    5    4    4    4    5
+## 38   2   2   3   2   2   2   2   2   2    2    3    3    1    3    1    3
+## 39   5   1   4   1   1   4   5   2   5    1    2    5    1    5    5    5
+## 40   4   2   5   4   4   4   4   4   4    2    3    3    2    5    4    5
+## 41   3   1   1   2   1   2   4   1   1    1    1    1    1    1    1    5
+## 42   3   2   3   2   2   2   2   3   3    2    4    3    3    2    2    3
+##    GP17 GP18 GP19 GP20 SWLS1 SWLS2 SWLS3 SWLS4 SWLS5 Q1Self Q2Others
+## 1     3    3    4    4     3     2     2     3     2    yes       no
+## 2     3    4    3    3     1     1     1     3     1     no      yes
+## 3     4    4    3    4     2     4     3     3     2    yes       no
+## 4     4    4    3    4     3     3     2     2     2    yes      yes
+## 5     3    4    4    4     3     3     3     4     2    yes       no
+## 6     4    3    4    4     3     4     3     5     4    yes       no
+## 7     2    3    3    2     3     3     4     4     5    yes       no
+## 8     4    4    4    4     3     3     4     4     4    yes      yes
+## 9     4    3    2    5     5     5     5     3     3    yes       no
+## 10    4    1    1    1     4     4     4     4     4     no       no
+## 11    4    3    2    4     3     4     4     4     3     no       no
+## 12    2    4    2    4     2     2     2     2     2    yes      yes
+## 13    3    2    2    2     3     3     4     4     3   &lt;NA&gt;       no
+## 15    2    2    3    2     3     4     3     4     4    yes       no
+## 16    2    4    4    4     4     4     3     4     3    yes      yes
+## 17    4    4    4    5     1     1     2     1     3    yes      yes
+## 19    2    3    3    4     3     4     4     3     3    yes      yes
+## 20    2    2    2    2     2     3     3     3     1     no       no
+## 21    3    4    3    4     2     1     1     1     1     no     &lt;NA&gt;
+## 22    3    3    1    2     3     4     4     4     3    yes       no
+## 23    5    5    5    5     1     1     1     3     1    yes      yes
+## 24    4    5    5    4     1     2     2     1     2    yes      yes
+## 25    2    4    1    2     4     3     5     5     3    yes       no
+## 26    5    5    3    4     5     4     5     5     5    yes       no
+## 27    1    3    2    2     2     2     3     4     4     no       no
+## 28    4    4    3    5     4     5     4     5     4    yes      yes
+## 29    4    5    5    4     4     4     3     2     2    yes      yes
+## 30    1    5    4    5     3     2     2     3     2    yes       no
+## 31    2    3    3    2     5     5     5     5     5     no       no
+## 32    2    3    2    3     3     2     2     3     2     no       no
+## 33    4    5    5    5     4     4     4     3     2    yes      yes
+## 34    2    3    4    4     3     3     3     3     2    yes      yes
+## 35    1    5    5    4     2     4     3     3     2    yes      yes
+## 36    5    4    4    5     3     3     3     4     3    yes      yes
+## 37    3    3    5    4     3     3     4     4     4    yes       no
+## 38    1    3    3    2     4     5     5     4     3     no       no
+## 39    1    5    5    5     3     2     2     3     1    yes      yes
+## 40    2    1    5    4     4     4     4     4     2    yes      yes
+## 41    2    2    2    2     3     2     2     3     3    yes       no
+## 42    3    3    2    3     3     4     3     4     2    yes       no
+##    DPMean AIPMean GPMean SWLSMean
+## 1     3.2   2.667   3.20      2.4
+## 2     3.2   3.067   2.80      1.4
+## 3     3.0   2.733   3.20      2.8
+## 4     3.6   3.867   3.70      2.4
+## 5     3.4   2.067   3.90      3.0
+## 6     2.4   2.400   3.00      3.8
+## 7     1.6   2.133   2.35      3.8
+## 8     4.2   2.867   3.40      3.6
+## 9     4.4   2.867   3.40      4.2
+## 10    1.4   1.467   2.05      4.0
+## 11    2.0   2.400   2.55      3.6
+## 12    3.0   3.000   3.00      2.0
+## 13    3.0   2.667   2.60      3.4
+## 15    1.8   1.867   2.35      3.6
+## 16    3.4   3.000   2.95      3.6
+## 17    3.6   4.067   4.10      1.6
+## 19    2.6   3.400   3.00      3.4
+## 20    2.2   1.733   1.85      2.4
+## 21    2.8   1.933   2.70      1.2
+## 22    2.2   1.800   2.15      3.6
+## 23    5.0   4.533   4.35      1.4
+## 24    4.4   4.267   4.05      1.6
+## 25    1.8   1.867   2.10      4.0
+## 26    2.0   2.267   3.35      4.8
+## 27    2.2   2.400   2.30      3.0
+## 28    4.0   2.667   3.60      4.4
+## 29    3.4   4.400   4.35      3.0
+## 30    4.2   3.267   3.25      2.4
+## 31    1.8   2.067   2.20      5.0
+## 32    2.2   3.000   3.00      2.4
+## 33    3.4   3.200   3.70      3.4
+## 34    2.8   3.400   3.00      2.8
+## 35    3.4   4.133   3.90      2.8
+## 36    3.6   4.000   4.00      3.2
+## 37    3.2   3.933   3.95      3.6
+## 38    1.8   1.933   2.20      4.2
+## 39    3.2   3.333   3.40      2.2
+## 40    4.6   2.600   3.55      3.6
+## 41    1.2   1.000   1.75      2.6
+## 42    2.2   2.067   2.60      3.2</code></pre>
+<pre class="r"><code>library('dplyr') # to call the count command</code></pre>
+<pre><code>## 
+## Attaching package: 'dplyr'</code></pre>
+<pre><code>## The following objects are masked from 'package:plyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
+<pre><code>## The following objects are masked from 'package:data.table':
+## 
+##     between, first, last</code></pre>
+<pre><code>## The following objects are masked from 'package:stats':
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>AgeFreq&lt;- count(MergedData.filt.b, Age) #Generates frequency table.  
+AgeFreq #Verifies under 18 and 80 outlier is removed.</code></pre>
+<pre><code>## # A tibble: 13 x 2
+##      Age     n
+##    &lt;int&gt; &lt;int&gt;
+##  1    19   107
+##  2    20   117
+##  3    21   117
+##  4    22   122
+##  5    23   118
+##  6    24   119
+##  7    25   134
+##  8    28   551
+##  9    32   472
+## 10    38   410
+## 11    45   741
+## 12    55   623
+## 13    68   207</code></pre>
+</div>
+</div>
+<div id="b.-please-provide-in-pretty-fied-table-format-or-similar-descriptive-statistics-on-age-income-hdi-and-the-four-mean-columns-dp-etc..-create-a-simple-histogram-for-two-of-these-seven-variables.-comment-on-the-shape-of-the-distribution-in-your-markdown." class="section level1">
+<h1>4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.</h1>
+<div id="todo-properly-title-dp-and-aip-without-abbreviations." class="section level2">
+<h2>TODO Properly title DP and AIP without abbreviations.</h2>
+</div>
+</div>
+<div id="b.-create-a-barchart-in-ggplot-or-similar-which-displays-the-top-15-nations-in-average-procrastination-scores-using-one-measure-of-the-following-dp-aip-or-gp.-the-bars-should-be-in-descending-order-with-the-number-1-most-procrastinating-nation-at-the-top-and-15th-most-procrastinating-at-the-bottom.-omit-all-other-nations.-color-the-bars-by-hdi-category-see-3b.-use-any-color-palette-of-your-choice-other-than-the-default." class="section level1">
+<h1>5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.</h1>
+<pre class="r"><code>library(ggplot2)
+library(RColorBrewer)
+library(dplyr)
+ByCountry&lt;- group_by(MergedData.filt.b, MergedData.filt.b$Country) #Organizes by country
+CountryAIPMean &lt;- summarize(ByCountry,CAIPMean = mean(AIPMean)) # Summarizes by country and finds mean of AIP means of all observations, then assigns to dataframe
+CountryAIPMean &lt;- rename(CountryAIPMean, 'Country' = 'MergedData.filt.b$Country') #rename so we can merge by country
+CountryAIPMean.Cat &lt;- merge(CountryAIPMean, CountryHDI, by=c('Country')) #Attaches Categry to countries
+desOrder&lt;- CountryAIPMean.Cat[order(-CountryAIPMean.Cat$CAIPMean),] #Orders by AIPMean descending
+Des &lt;- head(desOrder, n=15) #Assigns 15 entries only
+
+ggplot(data=Des, aes(x=reorder(Country, -CAIPMean), y=CAIPMean, fill=Category)) +
+geom_bar(stat = &quot;identity&quot;)+
+theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab(&quot;Country&quot;) +
+ylab(&quot;AIPMean&quot;) + ggtitle(&quot;AIP Mean by Top 15 Countries&quot;)+
+scale_fill_brewer(palette= &quot;Spectral&quot;) +
+  theme(plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="c.-create-another-barchart-identical-in-features-to-5b-but-use-another-one-of-the-three-variables-dp-aip-or-gp.-how-many-nations-show-up-both-in-5bs-plot-and-5cs-which-if-any" class="section level1">
+<h1>5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?</h1>
+<pre class="r"><code>CountryDPMean &lt;- summarize(ByCountry,CDPMean = mean(DPMean)) # Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
+CountryDPMean &lt;- rename(CountryDPMean, 'Country' = 'MergedData.filt.b$Country') #rename so we can merge by country
+CountryDPMean.Cat &lt;- merge(CountryDPMean, CountryHDI, by=c('Country')) #Attaches Categry to countries
+desOrder.DP&lt;- CountryDPMean.Cat[order(-CountryDPMean.Cat$CDPMean),] #Orders by AIPMean descending
+Des.DP &lt;- head(desOrder.DP, n=15) #Assigns 15 entries only
+ggplot(data=Des.DP, aes(x=reorder(Country, -CDPMean), y=CDPMean, fill=Category)) +
+geom_bar(stat = &quot;identity&quot;)+
+theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab(&quot;Country&quot;) +
+ylab(&quot;DPMean&quot;) + ggtitle(&quot;DP Mean by Top 15 Countries&quot;)+
+  scale_fill_brewer(palette= &quot;Spectral&quot;) +
+  theme(plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="d.-is-there-a-relationship-between-age-and-income-create-a-scatterplot-and-make-an-assessment-of-whether-there-is-a-relationship.-color-each-point-based-on-the-gender-of-the-participant.-youre-welcome-to-use-lm-or-similar-functions-to-back-up-your-claims." class="section level1">
+<h1>5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.</h1>
+<pre class="r"><code>ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIncome, color=Gender)) + 
+  geom_point(size = 1, na.rm=TRUE) + 
+  labs(title = &quot;Relationship between Income and Age by Gender&quot;) + 
+  geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
+  theme(plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="e" class="section level1">
+<h1>5e</h1>
 </div>
 
 

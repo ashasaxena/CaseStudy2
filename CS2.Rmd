@@ -158,6 +158,7 @@ AgeFreq #Verifies under 18 and 80 outlier is removed.
 
 ```
 
+##TODO Properly title DP and AIP without abbreviations.
 
 #5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
 ```{r}
@@ -203,6 +204,7 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
   labs(title = "Relationship between Income and Age by Gender") + 
   geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
   theme(plot.title = element_text(hjust = 0.5))
-
 ```
 
+
+#5e
