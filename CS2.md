@@ -1071,4 +1071,44 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
 ![](CS2_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 
-#5e
+#5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
+
+
+##TODO RELABEL ALL CHARTS WITH MEANINGFULL TITLES.
+
+```r
+ggplot(MergedData.filt.b, aes(x = HDI, y = SWLSMean)) + 
+  geom_point(colour = 'red', size = 1, na.rm=TRUE) + 
+  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+![](CS2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+#5e Barplot
+
+```r
+ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) + 
+  geom_bar(stat = "identity", fill='red', na.rm=TRUE) 
+```
+
+![](CS2_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
+```r
+  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```
+## NULL
+```
+
+#6 Outputting to CSV format – Make sure there are no index numbers (10%)
+a The client would like the finalized HDI table (3A and 3B)
+b The client would like the Tidied version of the original input to be output in the repository, including the merged HDI data (3C).
+c The client would like a dataset (or two) that shows the Top 15 nations (in 5B and 5C), as well as their HDI scores.
+d All output should be in plain English or translated in the Codebook.
+
+#6a The client would like the finalized HDI table (3A and 3B)
+
+
