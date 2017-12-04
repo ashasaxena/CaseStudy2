@@ -1,14 +1,6 @@
 Case Study 2: Procrastination Study Codebook
 
-R Libraries:
-
-- data.table
-
-Dataframes:
-
--PD <- dataframe of raw data file Procrastination.csv
--PD.renamed <- dataframe of renamed columns for Procrastination.csv
-
+Date CSV contains the following columns names which are renamed in the R code:
 Column Rename
 
 "Age" <- "Age"
