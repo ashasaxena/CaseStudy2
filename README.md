@@ -36,3 +36,9 @@ loaded via a namespace (and not attached):
 
 AUTHORS
 author: "Jim Park, Asha Saxena, Andrew Walch"
+
+Jim Park - Focused on the .Rmd file coding (questions 1, 2, 3, 5, and 6) and the majority of file/graphics output.  Assisted with codebook and ReadME files.  Set up several team meetings.
+
+Asha Saxena - Focused on setting up the Github repository structure, writing of the codebook, client presentation/story and some of the plots/graphics.
+
+Andrew Walch - Andy to fill in.
