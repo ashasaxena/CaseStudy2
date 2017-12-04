@@ -8,52 +8,24 @@ Dataframes:
 
 PD <- dataframe of raw data file Procrastination.csv
 PD.renamed <- dataframe of renamed columns for Procrastination.csv
-PD.renamed$Age <- as.integer(round(PD.renamed$Age)) #rounds all Ages to the nearest integer and converts from numeric to integer.
-PD.renamed$Years <- as.integer(round(PD.renamed$Years)) #rounds all Years to the nearest integer and converts from from numeric to integer.
-PD.renamed$Years <- as.integer(gsub(999, NA, PD.renamed$Years)) #Removes 999 values and treats them as missing by indicating with an NA
-PD.renamed$NumSon <- (gsub("Male", 1, PD.renamed$NumSon)) #subs a 1 where the word Male is listed in NumSon
-PD.renamed$NumSon <- (gsub("Female", 2, PD.renamed$NumSon)) #subs a 2 where the word Female is listed in NumSon
-PD.renamed$NumSon <- as.integer(PD.renamed$NumSon) #Converts NumSon to an integer.
-PD.renamed$Country <- gsub(0, NA, PD.renamed$Country) #displays Country with 0 as missing data (NA)
-PD.renamed$Country[PD.renamed$Country == ""] <- NA #replaces all non-entries with NA
-PD.renamed$Occupation[PD.renamed$Occupation == 0] <- NA
-PD.renamed$Occupation[PD.renamed$Occupation == "please specify"] <- NA
-PD.renamed$Occupation[PD.renamed$Occupation == ""] <- NA
-PD.renamed$Country[PD.renamed$Country == "Isreal"] <- "Israel"
-PD.renamed$Q1Self[PD.renamed$Q1Self == ""] <- NA
-PD.renamed$Q2Others <- as.character(PD.renamed$Q2Others)
-PD.renamed$Q2Others[PD.renamed$Q2Others == ""] <- NA
-PD.renamed$Q2Others[PD.renamed$Q2Others == "0"] <- NA
-PD.renamed$Q2Others[PD.renamed$Q2Others == "4"] <- NA
-PD.renamed$Q2Others <- as.factor(PD.renamed$Q2Others)
-PD.renamed$Gender[PD.renamed$Gender == ""] <- NA
-PD.renamed$DPMean=rowMeans(PD.renamed[,15:19]) #Creates column for mean of all DP entries in observation.
-PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34]) #Creates column for mean of all AIP entries in observation.
-PD.renamed$GPMean=rowMeans(PD.renamed[,35:54]) #Creates column for mean of all GP entries in observation.
-PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59]) #Creates column for mean of all SWLS entries in observation.
-PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 3) #Round DP, AIP, GP, and SWLS means to 1 digit.
 
-CountryHDI$Country <- gsub(" ", "", CountryHDI$Country, fixed = TRUE) #Removes extra spaces that area not needed.
-CountryHDI$Country <- gsub("(^\\s+)|(\\s+$)", "", CountryHDI$Country) #Removes extra spaces that area not needed.
-PD.renamed$Country <- gsub("(^\\s+)|(\\s+$)", "", PD.renamed$Country) #Removes extra spaces that area not needed.
-PD.renamed$Country <- gsub(" ", "", PD.renamed$Country, fixed = TRUE) #Removes extra spaces that area not needed.
-CountryHDI$Country[CountryHDI$Country == "AntiguaandBarbuda"] <- "Antigua"
-MergedData <- merge(CountryHDI, PD.renamed, by=c('Country'))
-head(MergedData)
+CountryHDI <- Convert Country by HDI to data frame.
+MergedData <- merge data by Country name and HDI
+MergedData.filt <- subset of MergedData.filt with age 18 and under removed
+MergedData.filt.b <- subset of MergedData.filt with age 80 and under removed
 
-pu <- unique(PD.renamed$Country)
-hu <- unique(CountryHDI$Country)
-a<- pu[pu %nin% hu]  #Finds unique Countries in the procrastination data set that are not in the HDI dataset. These are the ones that could not be matched up. 
+pu <- Unique list of countries from procastination data
+hu <- unique renamed data set
+a<- List unique Countries in the procrastination data set that are not in the HDI dataset. Data cleaning step.
 
-MergedData.filt <- subset(MergedData, Age > 18)
-MergedData.filt.b <- subset(MergedData.filt, Age != 80)
 
-CountryDPMean <- summarize(ByCountry,CDPMean = mean(DPMean)) # Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
-CountryDPMean <- rename(CountryDPMean, 'Country' = 'MergedData.filt.b$Country') #rename so we can merge by country
-CountryDPMean.Cat <- merge(CountryDPMean, CountryHDI, by=c('Country')) #Attaches Categry to countries
-desOrder.DP<- CountryDPMean.Cat[order(-CountryDPMean.Cat$CDPMean),] #Orders by AIPMean descending
-Des.DP <- head(desOrder.DP, n=15) #Assigns 15 entries only
+CountryDPMean <- Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
+desOrder.DP<- Same as CountryDPMean in descending order by DPMean
+Des.DP <- Assigns 15 entries only
 
+CountryAIPMean <- Summarizes by country and finds mean of AIP means of all observations, then assigns to dataframe
+desOrder.AIP<- Same as CountryAIPMean in descending order by AIPMean
+Des.AIP <- Assigns 15 entries only
 
 Column Rename
 
@@ -71,6 +43,8 @@ Column Rename
 "Status" <- "Marital Status"
 "NumSon"<- "Number of sons"
 "NumDaught"<-"Number of daughters"
+"HDI" <- "Human Development Index"
+"Category" <- "Category for HDI"
 "DP1" <- "(DP 1) I waste a lot of time on trivial matters before getting to the final decisions"
 "DP2" <- "(DP 2) Even after I make a decision I delay acting upon it"
 "DP3"<- "(DP 3) I don’t make decisions unless I really have to"
@@ -118,4 +92,10 @@ Column Rename
 "SWLS5" <- "(SWLS 5) If I could live my life over, I would change almost nothing"
 "Q1Self" <- "Do you consider yourself a procrastinator?"
 "Q2Others"<- "Do others consider you a procrastinator?"
+"DPMean" <- "Mean of DP1 to DP5"
+"AIPMean" <- "Mean of AIP1 to AIP15"
+"GPMean" <- "Mean of GP1 to GP20"
+"SWLSMean" <- "Mean of SWLS1 to SWLS5"
+
+
 
