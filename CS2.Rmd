@@ -12,17 +12,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-#2a Read the csv into R and take a look at the data set. Output how many rows and columns the data.frame is.
+
 
 ```{r}
+#2a Read the csv into R and take a look at the data set. Output how many rows and columns the data.frame is.
 PD <- read.csv("Procrastination.csv")
 dim(PD) #results in printing the number of rows then the number of columns.
 ```
 
 
-#2b The column names are either too much or not enough. Change the column names so that they do not have spaces, underscores, slashes, and the like. All column names should be under 12 characters. Make sure you’re updating your codebook with information on the tidied data set as well.
+
 
 ```{r}
+#2b The column names are either too much or not enough. Change the column names so that they do not have spaces, underscores, slashes, and the like. All column names should be under 12 characters. Make sure you’re updating your codebook with information on the tidied data set as well.
+
 class(PD)
 OldNames <- names(PD)
 library(data.table)
@@ -30,18 +33,25 @@ PD.renamed <- setnames(PD, old=OldNames, new=c("Age", "Gender", "Kids", "Educati
 head(PD.renamed)
 ```
 
+
+
+
+
+
+
+```{r}
 #2c. Some columns are, due to Qualtrics, malfunctioning. Prime examples are the following columns: “How long have you held this position?: Years”, Country of residence, Number of sons, and Current Occupation.
 
-i Some have impossible data values. Detail what you are doing to fix these columns in the raw data and why. It’s a judgment call for each, but explain why. For example, most people have not been doing anything for over 100 years. For the “Years” columns, round to the nearest integer.
+#i Some have impossible data values. Detail what you are doing to fix these columns in the raw data and why. It’s a judgment call for each, but explain why. For example, most people have not been doing anything for over 100 years. For the “Years” columns, round to the nearest integer.
 
-ii Somehow, “Number of sons” was labeled with Male (1) and Female (2). Change these incorrect labels back to integers.
+#ii Somehow, “Number of sons” was labeled with Male (1) and Female (2). Change these incorrect labels back to integers.
 
-iii There are no “0” country of residences. Treat this as missing.
+#iii There are no “0” country of residences. Treat this as missing.
 
-iv Current Occupation has no “please specify” or “0.” Treat them as missing. Some jobs are quite similar. Use judgment calls to make overwrite them into the same category. It does not have to be 100% accurate, but right now “ESL Teacher” would not be counted as “teacher” if there were unique counts.
+#iv Current Occupation has no “please specify” or “0.” Treat them as missing. Some jobs are quite similar. Use judgment calls to make overwrite them into the same category. It does not have to be 100% accurate, but right now “ESL Teacher” would not be counted as “teacher” if there were unique counts.
 
 #2Ci. Fix impossible data values.  Round Age and Years to nearest integer (negative exponents will default to 0 due to this), Correct Years '999' entries and treat as missing(NA), and correct number of sons entries where Male = 1 sons, and Female =2 sons, Change 0 in "Country" to NA to indicate the data is missing, change "please specify" or "0" under Occupation to NA to indicate missing, and combine similar occupations into category of occupation.
-```{r}
+
 PD.renamed$Age <- as.integer(round(PD.renamed$Age)) #rounds all Ages to the nearest integer and converts from numeric to integer.
 PD.renamed$Years <- as.integer(round(PD.renamed$Years)) #rounds all Years to the nearest integer and converts from from numeric to integer.
 PD.renamed$Years <- as.integer(gsub(999, NA, PD.renamed$Years)) #Removes 999 values and treats them as missing by indicating with an NA
@@ -62,10 +72,12 @@ PD.renamed$Q2Others[PD.renamed$Q2Others == "4"] <- NA
 PD.renamed$Q2Others <- as.factor(PD.renamed$Q2Others)
 PD.renamed$Gender[PD.renamed$Gender == ""] <- NA
 ```
-#2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
+
 
 
 ```{r}
+#2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
+
 PD.renamed$DPMean=rowMeans(PD.renamed[,15:19]) #Creates column for mean of all DP entries in observation.
 PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34]) #Creates column for mean of all AIP entries in observation.
 PD.renamed$GPMean=rowMeans(PD.renamed[,35:54]) #Creates column for mean of all GP entries in observation.
@@ -74,9 +86,11 @@ PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 3) #Round DP, AIP, GP, 
 head(PD.renamed[,62:65])
 ```
 
+
+```{r, echo = TRUE}
 ##3 SCRAPING
 #3a Scraped Country and HDI
-```{r, echo = TRUE}
+
 library('rvest') # grab and parse HTML
 
 #Specifying the url for desired website to be scrapped
@@ -97,9 +111,10 @@ CountryHDI
 ## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
-#3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.
+
 
 ```{r}
+#3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.
 
 CountryHDI$Category <- cut(CountryHDI$HDI, 
                        breaks = c(0, 0.55, 0.7, 0.8, 1.0), 
@@ -110,9 +125,11 @@ write.csv(CountryHDI, file = "CountryHDI.csv") #Creates csv file
 ```
 
 
-#3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).
+
 
 ```{r}
+#3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).
+
 CountryHDI$Country <- gsub(" ", "", CountryHDI$Country, fixed = TRUE) #Removes extra spaces that area not needed.
 CountryHDI$Country <- gsub("(^\\s+)|(\\s+$)", "", CountryHDI$Country) #Removes extra spaces that area not needed.
 PD.renamed$Country <- gsub("(^\\s+)|(\\s+$)", "", PD.renamed$Country) #Removes extra spaces that area not needed.
@@ -124,8 +141,10 @@ head(MergedData)
 
 
 
-#Code to identify country mismatches after merge including NA's
+
 ```{r}
+#Code to identify country mismatches after merge including NA's.
+
 library('plyr') # to call the count command
 
 '%nin%' <- Negate('%in%')
@@ -137,11 +156,13 @@ a
 ```
 #Comment:  The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)
 
+
+
+```{r}
 #4a Remove all observations where the participant is under age 18. No further analysis of underage individuals is permitted by your client. Remove any other age outliers as you see fit, but be sure to tell what you’re doing and why.
 
 ##REMOVED AGE = 80 (OUTLIER) BELOW.
 
-```{r}
 MergedData.filt <- subset(MergedData, Age > 18)
 MergedData.filt.b <- subset(MergedData.filt, Age != 80)
 library('dplyr') # to call the count command
@@ -151,10 +172,10 @@ AgeFreq<- count(MergedData.filt.b, Age) #Generates frequency table.
 AgeFreq #Verifies under 18 and 80 outlier is removed.
 ```
 
-#4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
+
 
 ```{r}
-
+#4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
 
 ```
 
@@ -198,9 +219,11 @@ ylab("DPMean") + ggtitle("DP Mean by Top 15 Countries")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-#5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
+
 
 ```{r}
+#5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
+
 ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIncome, color=Gender)) + 
   geom_point(size = 1, na.rm=TRUE) + 
   labs(title = "Relationship between Income and Age by Gender") + 
@@ -209,11 +232,13 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
 ```
 
 
-#5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
+
 
 
 ##TODO RELABEL ALL CHARTS WITH MEANINGFULL TITLES.
 ```{r}
+#5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
+
 ggplot(MergedData.filt.b, aes(x = HDI, y = SWLSMean)) + 
   geom_point(colour = 'red', size = 1, na.rm=TRUE) + 
   labs(title = "Relationship between HDI and Life Satisfaction") + 
@@ -222,30 +247,37 @@ ggplot(MergedData.filt.b, aes(x = HDI, y = SWLSMean)) +
 ```
 #5e Barplot
 ```{r}
+#5e Barplot
+
 ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) + 
   geom_bar(stat = "identity", fill='red', na.rm=TRUE) 
   labs(title = "Relationship between HDI and Life Satisfaction") + 
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+
+```{r}
 #6 Outputting to CSV format – Make sure there are no index numbers (10%)
 #6a The client would like the finalized HDI table (3A and 3B)
 
-```{r}
 library(gridExtra)
 pdf(file = "HDI.pdf", height = 54, width = 7)
 grid.table(CountryHDI, cols = colnames(CountryHDI), rows = NULL)
 dev.off()
 ```
 
-#6b. The client would like the Tidied version of the original input to be output in the repository, including the merged HDI data (3C).
+
 ```{r}
+#6b. The client would like the Tidied version of the original input to be output in the repository, including the merged HDI data (3C).
+
 write.csv(MergedData.filt.b, file = "MergedDataProcrastinationHDI.csv",row.names=FALSE)
 ```
 
-#6c The client would like a dataset (or two) that shows the Top 15 nations (in 5B and 5C), as well as their HDI scores.
+
 
 ```{r}
+#6c The client would like a dataset (or two) that shows the Top 15 nations (in 5B and 5C), as well as their HDI scores.
+
 library(dplyr)
 Des.DP.ColsRemoved <- select(Des.DP, Country, CDPMean, HDI)
 write.csv(Des.DP.ColsRemoved, file = "Top15CountriesHDI.csv",row.names=FALSE)
