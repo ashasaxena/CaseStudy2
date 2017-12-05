@@ -177,7 +177,61 @@ AgeFreq #Verifies under 18 and 80 outlier is removed.
 ```{r}
 #4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
 
+library(pastecs)
+dfTemp <- MergedData.filt.b
+attach(dfTemp)
+
+dfTemp <- cbind(Age, AnnualIncome, as.double(HDI), DP1, AIP1, GP1, SWLS1)
+colnames(dfTemp) <- c("Age", "AnnualIncome", "HDI", "DPMean", "AIPMean","GPMean", "SWLSMean")
+options(scipen=100)
+options(digits=0)
+#stat.desc(dfTemp, basic=F)
+stat.desc(dfTemp)
+dfTemp <- cbind(Age, AnnualIncome)
+dfTemp <- data.frame(dfTemp)
+
+
+hist(dfTemp$Age, ylim = c(0,800), main="Age Frequency Distribution", 
+     xlab="Age", border="blue", ylab = "Age Frequency", col="lightgreen") 
+
+# Age distribution is skewed right with the bulk of the age between 20 and 45.
+
+hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution", 
+     xlab="Income", border="blue", ylab = "Income Frequency", col="lightgreen") 
+
+# Income distribution is skewed right with the bulk of the income between 0 and 100,000.
+detach(dfTemp)
 ```
+
+```{r}
+#4d. Give the counts (again, pretty table) of how many participants per country in descending order.
+library(dplyr)
+dfTempCounts <- MergedData.filt.b
+attach(dfTempCounts)
+
+ dfTempCounts %>% select(Country) %>% group_by(Country) %>% 
+  dplyr::summarise(Participant_Count = n()) %>% 
+  plyr::arrange(desc(Participant_Count))
+```
+
+
+
+```{r}
+#4e. There are two variables in the set: whether the person considers themselves a procrastinator (yes/no) and whether others consider them a procrastinator (yes/no). How many people matched their perceptions to others’ (so, yes/yes and no/no)? To clarify: how many people said they felt they were procrastinators and also said others thought they were procrastinators? Likewise, how many said they were not procrastinators and others also did not think they were procrastinators?
+
+  x <- MergedData.filt.b %>% select(Q1Self, Q2Others)
+  x$Q1Self <- as.character(x$Q1Self)#self Responce
+  x$Q2Others <- as.character(x$Q2Others)#other views
+  
+  x %>% select(Q1Self,Q2Others) %>% ungroup() %>%#ungroup responces
+  filter(base::nchar(Q1Self)>0 & base::nchar(Q2Others)>0) %>% #filters Q1self and Q2Others responces
+  filter(Q1Self==Q2Others) %>% group_by(Q1Self) %>% #compares Q1 abd Q2 to eachother
+  dplyr::summarise(InAgreement_Count = n()) %>% 
+  rename(InAgreement = Q1Self)
+```
+
+
+
 
 ##TODO Properly title DP and AIP without abbreviations.
 
