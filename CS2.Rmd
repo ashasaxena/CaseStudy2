@@ -71,6 +71,15 @@ PD.renamed$Q2Others[PD.renamed$Q2Others == "0"] <- NA
 PD.renamed$Q2Others[PD.renamed$Q2Others == "4"] <- NA
 PD.renamed$Q2Others <- as.factor(PD.renamed$Q2Others)
 PD.renamed$Gender[PD.renamed$Gender == ""] <- NA
+PD.renamed$Occupation<- gsub(" ", "", PD.renamed$Occupation)
+#Replaces several descriptions with Educator.
+d <- PD.renamed$Occupation
+d[grepl("eacher", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("cademic", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("rofessor", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("ducator", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("ducation", d, ignore.case=FALSE)] <- "Educator"
+PD.renamed$Occupation <- d
 ```
 
 

@@ -10,7 +10,7 @@ C) Resources - Assignment for CaseStudy2 as a reference.
 D) HTML and md files generated from the CS2.Rmd code
 E) CaseStudy2.Rproj, which is useful when viewing all of the information on RStudio.
 
-SESSION INFO
+S
 R version 3.4.2 (2017-09-28)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 Running under: Windows >= 8 x64 (build 9200)
@@ -24,7 +24,7 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
-other attached packages:
+other attached packages:ESSION INFO
 [1] bindrcpp_0.2        RColorBrewer_1.1-2  ggplot2_2.2.1       dplyr_0.7.4         plyr_1.8.4          rvest_0.3.2        
 [7] xml2_1.1.1          data.table_1.10.4-3
 
