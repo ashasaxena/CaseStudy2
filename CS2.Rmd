@@ -38,7 +38,7 @@ head(PD.renamed)
 
 
 
-
+## This is the part where the rationale for combining "teachers" needs to be explained.
 ```{r}
 #2c. Some columns are, due to Qualtrics, malfunctioning. Prime examples are the following columns: “How long have you held this position?: Years”, Country of residence, Number of sons, and Current Occupation.
 
@@ -203,9 +203,18 @@ hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution",
 detach(dfTemp)
 ```
 
+
+
 ```{r}
 #4c. Give the frequencies (in table format or similar) for Gender, Work Status, and Occupation. They can be separate tables, if that’s your choice.
 
+library('dplyr') # to call the count command
+GenderCount <- count(MergedData.filt.b, Gender)
+WorkStatusCount <- count(MergedData.filt.b, WorkStatus)
+OccupationCount <- count(MergedData.filt.b, Occupation)
+GenderCount
+WorkStatusCount
+OccupationCount
 ```
 
 
@@ -220,8 +229,6 @@ attach(dfTempCounts)
   dplyr::summarise(Participant_Count = n()) %>% 
   plyr::arrange(desc(Participant_Count))
 ```
-
-
 
 ```{r}
 #4e. There are two variables in the set: whether the person considers themselves a procrastinator (yes/no) and whether others consider them a procrastinator (yes/no). How many people matched their perceptions to others’ (so, yes/yes and no/no)? To clarify: how many people said they felt they were procrastinators and also said others thought they were procrastinators? Likewise, how many said they were not procrastinators and others also did not think they were procrastinators?

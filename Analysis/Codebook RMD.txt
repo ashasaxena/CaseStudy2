@@ -27,6 +27,15 @@ CountryAIPMean <- Summarizes by country and finds mean of AIP means of all obser
 desOrder.AIP<- Same as CountryAIPMean in descending order by AIPMean
 Des.AIP <- Assigns 15 entries only
 
+dfTemp <- Temporary dataframe for frequency analysis and histograms.
+dfTempCounts <- Temporary dataframe for frequency analysis of participants of study by Country
+
+GenderCount <- dataframe with frequency count of each gender.
+WorkStatusCount<- dataframe with frequency by WorkStatus
+OccupationCount <- dataframe with frequency count by Occupation.
+
+x <- dataframe created to compare Self and Others assessments of procrastination (Q1Self and Q2Others)
+
 Column Rename
 
 "Age" <- "Age"
