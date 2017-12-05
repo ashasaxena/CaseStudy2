@@ -16,8 +16,8 @@ MergedData.filt.b <- subset of MergedData.filt with age 80 and under removed
 
 pu <- Unique list of countries from procastination data
 hu <- unique renamed data set
-a<- List unique Countries in the procrastination data set that are not in the HDI dataset. Data cleaning step.
-
+a <- List unique Countries in the procrastination data set that are not in the HDI dataset. Data cleaning step.
+d <- Character vector used for the grepl command to change/consolidate the Occupation category for education/teaching related Occupations.
 
 CountryDPMean <- Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
 desOrder.DP<- Same as CountryDPMean in descending order by DPMean
