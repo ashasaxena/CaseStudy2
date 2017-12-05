@@ -5,10 +5,9 @@ November 25, 2017
 
 
 
-#2a Read the csv into R and take a look at the data set. Output how many rows and columns the data.frame is.
-
 
 ```r
+#2a Read the csv into R and take a look at the data set. Output how many rows and columns the data.frame is.
 PD <- read.csv("Procrastination.csv")
 dim(PD) #results in printing the number of rows then the number of columns.
 ```
@@ -18,10 +17,9 @@ dim(PD) #results in printing the number of rows then the number of columns.
 ```
 
 
+```r
 #2b The column names are either too much or not enough. Change the column names so that they do not have spaces, underscores, slashes, and the like. All column names should be under 12 characters. Make sure you’re updating your codebook with information on the tidied data set as well.
 
-
-```r
 class(PD)
 ```
 
@@ -81,19 +79,22 @@ head(PD.renamed)
 ## 6     3    yes      yes
 ```
 
+
+## This is the part where the rationale for combining "teachers" needs to be explained.
+
+```r
 #2c. Some columns are, due to Qualtrics, malfunctioning. Prime examples are the following columns: “How long have you held this position?: Years”, Country of residence, Number of sons, and Current Occupation.
 
-i Some have impossible data values. Detail what you are doing to fix these columns in the raw data and why. It’s a judgment call for each, but explain why. For example, most people have not been doing anything for over 100 years. For the “Years” columns, round to the nearest integer.
+#i Some have impossible data values. Detail what you are doing to fix these columns in the raw data and why. It’s a judgment call for each, but explain why. For example, most people have not been doing anything for over 100 years. For the “Years” columns, round to the nearest integer.
 
-ii Somehow, “Number of sons” was labeled with Male (1) and Female (2). Change these incorrect labels back to integers.
+#ii Somehow, “Number of sons” was labeled with Male (1) and Female (2). Change these incorrect labels back to integers.
 
-iii There are no “0” country of residences. Treat this as missing.
+#iii There are no “0” country of residences. Treat this as missing.
 
-iv Current Occupation has no “please specify” or “0.” Treat them as missing. Some jobs are quite similar. Use judgment calls to make overwrite them into the same category. It does not have to be 100% accurate, but right now “ESL Teacher” would not be counted as “teacher” if there were unique counts.
+#iv Current Occupation has no “please specify” or “0.” Treat them as missing. Some jobs are quite similar. Use judgment calls to make overwrite them into the same category. It does not have to be 100% accurate, but right now “ESL Teacher” would not be counted as “teacher” if there were unique counts.
 
 #2Ci. Fix impossible data values.  Round Age and Years to nearest integer (negative exponents will default to 0 due to this), Correct Years '999' entries and treat as missing(NA), and correct number of sons entries where Male = 1 sons, and Female =2 sons, Change 0 in "Country" to NA to indicate the data is missing, change "please specify" or "0" under Occupation to NA to indicate missing, and combine similar occupations into category of occupation.
 
-```r
 PD.renamed$Age <- as.integer(round(PD.renamed$Age)) #rounds all Ages to the nearest integer and converts from numeric to integer.
 PD.renamed$Years <- as.integer(round(PD.renamed$Years)) #rounds all Years to the nearest integer and converts from from numeric to integer.
 PD.renamed$Years <- as.integer(gsub(999, NA, PD.renamed$Years)) #Removes 999 values and treats them as missing by indicating with an NA
@@ -105,7 +106,7 @@ PD.renamed$Country[PD.renamed$Country == ""] <- NA #replaces all non-entries wit
 PD.renamed$Occupation[PD.renamed$Occupation == 0] <- NA
 PD.renamed$Occupation[PD.renamed$Occupation == "please specify"] <- NA
 PD.renamed$Occupation[PD.renamed$Occupation == ""] <- NA
-PD.renamed$Country[PD.renamed$Country == "Isreal"] <- "Israel"
+PD.renamed$Country[PD.renamed$Country == "Isreal"] <- "Israel" #Israel was mispelled.
 PD.renamed$Q1Self[PD.renamed$Q1Self == ""] <- NA
 PD.renamed$Q2Others <- as.character(PD.renamed$Q2Others)
 PD.renamed$Q2Others[PD.renamed$Q2Others == ""] <- NA
@@ -113,12 +114,21 @@ PD.renamed$Q2Others[PD.renamed$Q2Others == "0"] <- NA
 PD.renamed$Q2Others[PD.renamed$Q2Others == "4"] <- NA
 PD.renamed$Q2Others <- as.factor(PD.renamed$Q2Others)
 PD.renamed$Gender[PD.renamed$Gender == ""] <- NA
+PD.renamed$Occupation<- gsub(" ", "", PD.renamed$Occupation)
+#Replaces several descriptions with Educator.
+d <- PD.renamed$Occupation
+d[grepl("eacher", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("cademic", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("rofessor", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("ducator", d, ignore.case=FALSE)] <- "Educator"
+d[grepl("ducation", d, ignore.case=FALSE)] <- "Educator"
+PD.renamed$Occupation <- d
 ```
-#2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
-
 
 
 ```r
+#2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
+
 PD.renamed$DPMean=rowMeans(PD.renamed[,15:19]) #Creates column for mean of all DP entries in observation.
 PD.renamed$AIPMean=rowMeans(PD.renamed[,20:34]) #Creates column for mean of all AIP entries in observation.
 PD.renamed$GPMean=rowMeans(PD.renamed[,35:54]) #Creates column for mean of all GP entries in observation.
@@ -137,10 +147,11 @@ head(PD.renamed[,62:65])
 ## 6    2.8   4.333   4.00      3.2
 ```
 
+
+```r
 ##3 SCRAPING
 #3a Scraped Country and HDI
 
-```r
 library('rvest') # grab and parse HTML
 ```
 
@@ -362,10 +373,10 @@ CountryHDI
 ## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
-#3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.
-
 
 ```r
+#3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.
+
 CountryHDI$Category <- cut(CountryHDI$HDI, 
                        breaks = c(0, 0.55, 0.7, 0.8, 1.0), 
                        labels = c("Low", "Medium", "High", "VeryHigh"), 
@@ -571,10 +582,9 @@ write.csv(CountryHDI, file = "CountryHDI.csv") #Creates csv file
 ```
 
 
+```r
 #3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).
 
-
-```r
 CountryHDI$Country <- gsub(" ", "", CountryHDI$Country, fixed = TRUE) #Removes extra spaces that area not needed.
 CountryHDI$Country <- gsub("(^\\s+)|(\\s+$)", "", CountryHDI$Country) #Removes extra spaces that area not needed.
 PD.renamed$Country <- gsub("(^\\s+)|(\\s+$)", "", PD.renamed$Country) #Removes extra spaces that area not needed.
@@ -592,13 +602,13 @@ head(MergedData)
 ## 4 Afghanistan 0.479      Low  55   Male Yes Kids        ma  full-time
 ## 5     Albania 0.764     High  45 Female  No Kids     ltuni  full-time
 ## 6     Albania 0.764     High  68   Male Yes Kids       deg  part-time
-##   AnnualIncome       Occupation Years Months    Community   Status NumSon
-## 1        87500             <NA>     0      6   Large Town  Married      0
-## 2        10000             <NA>     7      0      Village Divorced      4
-## 3        10000             <NA>     0      0 Medium-Sized   Single      0
-## 4       150000             <NA>     0      0   Large Town  Married      4
-## 5       150000             <NA>     0      0   Large Town   Single      0
-## 6        87500 Media Consultant     4      0   Large-City Divorced      0
+##   AnnualIncome      Occupation Years Months    Community   Status NumSon
+## 1        87500            <NA>     0      6   Large Town  Married      0
+## 2        10000            <NA>     7      0      Village Divorced      4
+## 3        10000            <NA>     0      0 Medium-Sized   Single      0
+## 4       150000            <NA>     0      0   Large Town  Married      4
+## 5       150000            <NA>     0      0   Large Town   Single      0
+## 6        87500 MediaConsultant     4      0   Large-City Divorced      0
 ##   NumDaught DP1 DP2 DP3 DP4 DP5 AIP1 AIP2 AIP3 AIP4 AIP5 AIP6 AIP7 AIP8
 ## 1         0   3   3   3   4   3    3    2    2    2    3    2    3    3
 ## 2         0   4   3   4   3   2    1    2    1    4    3    5    4    4
@@ -630,11 +640,9 @@ head(MergedData)
 ```
 
 
-
-Misc code
-
-
 ```r
+#Code to identify country mismatches after merge including NA's.
+
 library('plyr') # to call the count command
 
 '%nin%' <- Negate('%in%')
@@ -650,308 +658,14 @@ a
 ```
 #Comment:  The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)
 
+
+```r
 #4a Remove all observations where the participant is under age 18. No further analysis of underage individuals is permitted by your client. Remove any other age outliers as you see fit, but be sure to tell what you’re doing and why.
 
 ##REMOVED AGE = 80 (OUTLIER) BELOW.
 
-
-```r
 MergedData.filt <- subset(MergedData, Age > 18)
 MergedData.filt.b <- subset(MergedData.filt, Age != 80)
-head(MergedData.filt, n=40)
-```
-
-```
-##        Country   HDI Category Age Gender     Kids Education WorkStatus
-## 1  Afghanistan 0.479      Low  55   Male  No Kids       deg  full-time
-## 2  Afghanistan 0.479      Low  55 Female Yes Kids       deg  full-time
-## 3  Afghanistan 0.479      Low  80 Female  No Kids     grade unemployed
-## 4  Afghanistan 0.479      Low  55   Male Yes Kids        ma  full-time
-## 5      Albania 0.764     High  45 Female  No Kids     ltuni  full-time
-## 6      Albania 0.764     High  68   Male Yes Kids       deg  part-time
-## 7      Algeria 0.745     High  55 Female Yes Kids       dip  full-time
-## 8      Algeria 0.745     High  45   Male Yes Kids        ma  full-time
-## 9      Algeria 0.745     High  38 Female  No Kids       deg  full-time
-## 10     Andorra 0.858 VeryHigh  80   Male  No Kids        ma    retired
-## 11     Andorra 0.858 VeryHigh  55   Male Yes Kids        ma  full-time
-## 12     Antigua 0.786     High  32   Male Yes Kids       dip  full-time
-## 13   Argentina 0.827 VeryHigh  68   Male Yes Kids            part-time
-## 15   Argentina 0.827 VeryHigh  32 Female  No Kids       deg  full-time
-## 16   Argentina 0.827 VeryHigh  45   Male Yes Kids       deg  full-time
-## 17   Australia 0.939 VeryHigh  32   Male  No Kids     ltuni  full-time
-## 19   Australia 0.939 VeryHigh  28   Male  No Kids       deg    student
-## 20   Australia 0.939 VeryHigh  38   Male  No Kids      high  full-time
-## 21   Australia 0.939 VeryHigh  55   Male  No Kids    lthigh unemployed
-## 22   Australia 0.939 VeryHigh  45   Male Yes Kids       deg  full-time
-## 23   Australia 0.939 VeryHigh  28   Male  No Kids     ltuni  part-time
-## 24   Australia 0.939 VeryHigh  28 Female  No Kids     ltuni  full-time
-## 25   Australia 0.939 VeryHigh  55 Female Yes Kids        ma    student
-## 26   Australia 0.939 VeryHigh  20 Female  No Kids     ltuni    student
-## 27   Australia 0.939 VeryHigh  55   Male Yes Kids       phd  full-time
-## 28   Australia 0.939 VeryHigh  55   Male Yes Kids        ma  full-time
-## 29   Australia 0.939 VeryHigh  23 Female  No Kids       deg    student
-## 30   Australia 0.939 VeryHigh  32 Female Yes Kids       phd    student
-## 31   Australia 0.939 VeryHigh  55 Female  No Kids       deg  full-time
-## 32   Australia 0.939 VeryHigh  38   Male Yes Kids       dip  full-time
-## 33   Australia 0.939 VeryHigh  19   Male  No Kids     ltuni    student
-## 34   Australia 0.939 VeryHigh  28 Female  No Kids        ma  full-time
-## 35   Australia 0.939 VeryHigh  22   Male  No Kids     ltuni    student
-## 36   Australia 0.939 VeryHigh  32   Male  No Kids       deg  full-time
-## 37   Australia 0.939 VeryHigh  32 Female  No Kids        ma  full-time
-## 38   Australia 0.939 VeryHigh  28   Male Yes Kids        ma  full-time
-## 39   Australia 0.939 VeryHigh  28   Male  No Kids       deg    student
-## 40   Australia 0.939 VeryHigh  38   Male  No Kids       deg unemployed
-## 41   Australia 0.939 VeryHigh  45   Male Yes Kids      high  full-time
-## 42   Australia 0.939 VeryHigh  28 Female  No Kids       deg  full-time
-##    AnnualIncome                          Occupation Years Months
-## 1         87500                                <NA>     0      6
-## 2         10000                                <NA>     7      0
-## 3         10000                                <NA>     0      0
-## 4        150000                                <NA>     0      0
-## 5        150000                                <NA>     0      0
-## 6         87500                    Media Consultant     4      0
-## 7         55000 Assoc. Governmental Program Analyst    28      0
-## 8         35000                                <NA>    10      0
-## 9         67500                                <NA>     9      6
-## 10        45000                             retired    17      0
-## 11       250000                             Finance    23      0
-## 12        25000                                <NA>     6      0
-## 13       150000                   BUSINESS CONSULTA    12      0
-## 15        67500                             manager     3      0
-## 16        55000                                <NA>     7      0
-## 17        45000                Service co-ordinator     0      7
-## 19        15000                                <NA>     0      3
-## 20       150000                                <NA>     6      3
-## 21        15000                                <NA>     6      6
-## 22        55000                   Technical officer     1      9
-## 23        15000                                <NA>     0      6
-## 24        55000                                <NA>     2      2
-## 25        15000                                <NA>     2      2
-## 26        10000                                <NA>     2      0
-## 27        55000                                <NA>     0      0
-## 28        35000                                <NA>     3      5
-## 29        15000                                <NA>     5      6
-## 30        45000                                <NA>     4      6
-## 31        15000                                <NA>     6      0
-## 32        45000                                <NA>     8      0
-## 33        15000                                <NA>     2      4
-## 34        55000                                <NA>     1      0
-## 35        10000                                <NA>     2      0
-## 36        87500                                <NA>     2      0
-## 37        67500                                <NA>     3      0
-## 38        55000                                <NA>     7      0
-## 39        10000                                <NA>     0      0
-## 40        10000                                <NA>     5      0
-## 41       150000                                <NA>     1      0
-## 42        55000                                <NA>     1      4
-##        Community   Status NumSon NumDaught DP1 DP2 DP3 DP4 DP5 AIP1 AIP2
-## 1     Large Town  Married      0         0   3   3   3   4   3    3    2
-## 2        Village Divorced      4         0   4   3   4   3   2    1    2
-## 3   Medium-Sized   Single      0         0   2   3   2   3   5    2    2
-## 4     Large Town  Married      4         2   4   4   4   3   3    3    4
-## 5     Large Town   Single      0         0   3   3   5   3   3    3    1
-## 6     Large-City Divorced      0         2   4   3   2   2   1    4    1
-## 7     Large-City  Married      0         4   3   2   1   1   1    2    1
-## 8        Village  Married      2         0   4   4   5   4   4    4    1
-## 9        Village  Married      0         0   4   4   5   5   4    1    2
-## 10  Medium-Sized   Single      0         0   2   1   1   2   1    1    1
-## 11    Large-City  Married      0         5   2   2   2   2   2    1    2
-## 12 Rural/Country Divorced      2         0   3   3   3   3   3    3    3
-## 13    Small Town  Married      3         0   3   3   3   3   3    1    2
-## 15    Large-City   Single      0         0   2   1   2   2   2    1    1
-## 16       Village  Married      1         2   4   4   4   3   2    1    1
-## 17    Large-City   Single      0         0   4   4   4   3   3    4    5
-## 19    Small Town  Married      0         0   3   3   3   2   2    2    3
-## 20       Village   Single      0         0   2   3   2   2   2    1    1
-## 21 Rural/Country Divorced      0         0   3   3   2   3   3    1    1
-## 22    Large-City  Married      2         0   3   3   3   1   1    1    1
-## 23       Village   Single      0         0   5   5   5   5   5    5    3
-## 24       Village   Single      0         0   4   4   4   5   5    2    4
-## 25  Medium-Sized  Married      0         2   3   2   2   1   1    1    1
-## 26       Village   Single      0         0   1   3   2   2   2    2    2
-## 27       Village  Married      1         2   3   2   3   2   1    1    1
-## 28                Married      0         2   4   4   4   4   4    2    1
-## 29       Village   Single      0         0   4   5   4   2   2    5    3
-## 30       Village  Married      0         1   3   3   5   5   5    3    1
-## 31       Village   Single      0         0   3   1   2   2   1    2    1
-## 32 Rural/Country  Married      2         0   4   2   2   1   2    2    1
-## 33       Village   Single      0         0   4   3   4   3   3    1    1
-## 34       Village   Single      0         0   2   3   3   3   3    2    3
-## 35       Village   Single      0         0   2   5   3   3   4    4    4
-## 36       Village   Single      0         0   4   4   4   3   3    3    2
-## 37 Rural/Country   Single      0         0   3   4   3   3   3    5    2
-## 38       Village  Married      0         1   2   3   2   1   1    1    1
-## 39       Village   Single      0         0   5   5   3   2   1    1    1
-## 40       Village  Married      0         0   4   4   5   5   5    1    1
-## 41 Rural/Country  Married      1         2   1   2   1   1   1    1    1
-## 42             8               0         0   2   2   3   2   2    2    1
-##    AIP3 AIP4 AIP5 AIP6 AIP7 AIP8 AIP9 AIP10 AIP11 AIP12 AIP13 AIP14 AIP15
-## 1     2    2    3    2    3    3    2     3     4     2     4     2     3
-## 2     1    4    3    5    4    4    3     3     3     4     3     3     3
-## 3     3    4    2    2    2    1    1     3     5     4     3     3     4
-## 4     5    4    3    4    3    5    4     3     5     5     1     5     4
-## 5     2    1    2    2    2    2    1     2     3     2     2     1     5
-## 6     5    1    2    1    1    3    2     3     3     1     3     1     5
-## 7     1    3    3    5    1    2    3     3     1     1     1     2     3
-## 8     4    1    3    3    4    2    3     3     3     1     5     3     3
-## 9     5    4    2    3    3    3    1     3     5     3     2     3     3
-## 10    3    2    1    1    1    1    3     1     2     2     1     1     1
-## 11    3    2    2    2    2    3    2     2     4     4     3     2     2
-## 12    3    3    3    3    3    3    3     3     3     3     3     3     3
-## 13    4    4    3    2    3    3    3     3     1     3     2     3     3
-## 15    1    1    5    4    1    2    2     2     3     1     2     1     1
-## 16    3    4    3    5    5    3    4     3     2     3     3     3     2
-## 17    3    5    3    4    5    4    3     4     4     5     4     4     4
-## 19    4    3    4    5    5    4    3     3     3     3     3     3     3
-## 20    2    2    3    2    1    1    2     2     2     1     3     1     2
-## 21    1    2    3    2    2    3    3     3     1     1     2     1     3
-## 22    2    3    2    1    1    3    1     2     1     3     2     2     2
-## 23    3    4    5    5    4    5    5     5     5     5     5     4     5
-## 24    3    5    4    5    5    4    5     5     3     5     4     5     5
-## 25    3    3    2    1    1    3    1     2     3     3     2     1     1
-## 26    1    3    1    1    1    4    1     2     2     2     5     2     5
-## 27    3    4    3    1    1    3    4     3     4     2     3     1     2
-## 28    3    2    3    3    3    4    3     3     4     2     4     1     2
-## 29    5    4    5    5    5    4    5     5     2     5     5     3     5
-## 30    3    2    5    4    3    5    4     5     3     3     3     1     4
-## 31    2    1    2    3    3    2    1     3     3     1     4     1     2
-## 32    5    4    2    4    2    4    3     4     2     2     3     2     5
-## 33    2    3    2    4    5    4    3     4     3     3     4     4     5
-## 34    2    4    3    5    4    3    4     4     2     4     4     3     4
-## 35    5    1    5    4    5    4    5     5     4     3     5     4     4
-## 36    5    3    5    4    5    4    5     5     5     3     4     3     4
-## 37    3    3    5    5    4    4    5     4     4     4     4     3     4
-## 38    3    2    2    2    1    1    1     3     3     2     2     3     2
-## 39    2    1    5    5    5    5    5     5     4     1     4     1     5
-## 40    2    2    3    3    5    3    2     4     4     1     4     1     3
-## 41    1    1    1    1    1    1    1     1     1     1     1     1     1
-## 42    2    2    2    2    2    2    2     2     2     2     3     2     3
-##    GP1 GP2 GP3 GP4 GP5 GP6 GP7 GP8 GP9 GP10 GP11 GP12 GP13 GP14 GP15 GP16
-## 1    4   2   4   3   3   3   3   4   4    2    2    3    2    4    3    4
-## 2    3   2   2   5   3   3   3   5   3    1    2    3    1    1    3    3
-## 3    4   4   1   4   4   4   4   3   2    2    3    3    2    3    2    4
-## 4    4   4   5   3   1   3   4   4   4    4    4    4    3    4    4    4
-## 5    5   3   2   2   5   4   5   5   5    1    3    4    5    5    5    4
-## 6    4   1   2   2   3   2   2   2   4    1    2    4    4    4    4    4
-## 7    3   1   1   3   4   1   2   2   3    1    3    3    2    2    3    3
-## 8    3   2   4   3   3   4   4   2   4    3    2    4    4    2    4    4
-## 9    4   2   4   3   4   5   2   5   3    1    5    3    1    3    4    5
-## 10   3   3   1   1   1   1   2   1   3    1    5    3    2    2    1    4
-## 11   3   2   2   2   2   2   3   3   3    2    2    3    2    2    2    3
-## 12   2   2   4   4   2   4   2   4   2    2    3    3    4    4    4    2
-## 13   3   3   3   1   2   1   2   2   3    4    2    3    2    4    3    5
-## 15   3   2   1   4   3   2   2   2   3    5    4    1    1    1    2    2
-## 16   4   3   1   3   2   2   2   3   4    2    2    4    3    3    4    3
-## 17   5   4   4   5   4   5   4   4   4    3    4    4    4    4    3    4
-## 19   3   1   2   5   3   3   3   3   4    3    3    3    3    3    4    2
-## 20   2   2   2   2   2   2   2   3   2    1    1    2    1    1    1    3
-## 21   4   2   2   3   2   2   4   3   4    1    2    4    1    1    3    2
-## 22   2   2   4   1   1   1   1   2   4    1    3    2    1    3    3    3
-## 23   5   2   5   5   5   5   5   5   3    2    1    5    4    5    5    5
-## 24   5   4   4   5   4   5   4   4   4    4    5    3    1    3    4    4
-## 25   2   1   2   2   2   2   1   2   2    2    3    2    2    3    3    2
-## 26   3   1   2   5   5   2   5   2   5    1    3    5    2    2    2    5
-## 27   2   1   2   4   3   2   3   2   3    1    5    1    1    2    3    3
-## 28   4   3   4   4   4   2   4   4   4    2    2    4    3    4    3    5
-## 29   4   4   3   5   5   2   4   3   5    5    4    5    5    5    5    5
-## 30   4   3   1   2   3   1   5   5   5    1    3    5    3    3    5    1
-## 31   3   1   1   1   3   1   3   2   3    1    2    3    2    3    3    2
-## 32   5   2   3   1   2   3   4   2   4    3    2    5    3    3    4    4
-## 33   4   3   4   5   2   2   4   4   4    2    4    4    1    4    4    4
-## 34   4   3   2   2   2   3   4   3   4    3    3    4    2    2    4    2
-## 35   4   5   2   5   4   1   5   5   5    5    4    4    4    4    5    1
-## 36   4   4   4   3   4   4   4   4   4    4    3    4    3    4    4    5
-## 37   4   4   4   4   4   4   4   3   5    4    2    5    4    4    4    5
-## 38   2   2   3   2   2   2   2   2   2    2    3    3    1    3    1    3
-## 39   5   1   4   1   1   4   5   2   5    1    2    5    1    5    5    5
-## 40   4   2   5   4   4   4   4   4   4    2    3    3    2    5    4    5
-## 41   3   1   1   2   1   2   4   1   1    1    1    1    1    1    1    5
-## 42   3   2   3   2   2   2   2   3   3    2    4    3    3    2    2    3
-##    GP17 GP18 GP19 GP20 SWLS1 SWLS2 SWLS3 SWLS4 SWLS5 Q1Self Q2Others
-## 1     3    3    4    4     3     2     2     3     2    yes       no
-## 2     3    4    3    3     1     1     1     3     1     no      yes
-## 3     4    4    3    4     2     4     3     3     2    yes       no
-## 4     4    4    3    4     3     3     2     2     2    yes      yes
-## 5     3    4    4    4     3     3     3     4     2    yes       no
-## 6     4    3    4    4     3     4     3     5     4    yes       no
-## 7     2    3    3    2     3     3     4     4     5    yes       no
-## 8     4    4    4    4     3     3     4     4     4    yes      yes
-## 9     4    3    2    5     5     5     5     3     3    yes       no
-## 10    4    1    1    1     4     4     4     4     4     no       no
-## 11    4    3    2    4     3     4     4     4     3     no       no
-## 12    2    4    2    4     2     2     2     2     2    yes      yes
-## 13    3    2    2    2     3     3     4     4     3   <NA>       no
-## 15    2    2    3    2     3     4     3     4     4    yes       no
-## 16    2    4    4    4     4     4     3     4     3    yes      yes
-## 17    4    4    4    5     1     1     2     1     3    yes      yes
-## 19    2    3    3    4     3     4     4     3     3    yes      yes
-## 20    2    2    2    2     2     3     3     3     1     no       no
-## 21    3    4    3    4     2     1     1     1     1     no     <NA>
-## 22    3    3    1    2     3     4     4     4     3    yes       no
-## 23    5    5    5    5     1     1     1     3     1    yes      yes
-## 24    4    5    5    4     1     2     2     1     2    yes      yes
-## 25    2    4    1    2     4     3     5     5     3    yes       no
-## 26    5    5    3    4     5     4     5     5     5    yes       no
-## 27    1    3    2    2     2     2     3     4     4     no       no
-## 28    4    4    3    5     4     5     4     5     4    yes      yes
-## 29    4    5    5    4     4     4     3     2     2    yes      yes
-## 30    1    5    4    5     3     2     2     3     2    yes       no
-## 31    2    3    3    2     5     5     5     5     5     no       no
-## 32    2    3    2    3     3     2     2     3     2     no       no
-## 33    4    5    5    5     4     4     4     3     2    yes      yes
-## 34    2    3    4    4     3     3     3     3     2    yes      yes
-## 35    1    5    5    4     2     4     3     3     2    yes      yes
-## 36    5    4    4    5     3     3     3     4     3    yes      yes
-## 37    3    3    5    4     3     3     4     4     4    yes       no
-## 38    1    3    3    2     4     5     5     4     3     no       no
-## 39    1    5    5    5     3     2     2     3     1    yes      yes
-## 40    2    1    5    4     4     4     4     4     2    yes      yes
-## 41    2    2    2    2     3     2     2     3     3    yes       no
-## 42    3    3    2    3     3     4     3     4     2    yes       no
-##    DPMean AIPMean GPMean SWLSMean
-## 1     3.2   2.667   3.20      2.4
-## 2     3.2   3.067   2.80      1.4
-## 3     3.0   2.733   3.20      2.8
-## 4     3.6   3.867   3.70      2.4
-## 5     3.4   2.067   3.90      3.0
-## 6     2.4   2.400   3.00      3.8
-## 7     1.6   2.133   2.35      3.8
-## 8     4.2   2.867   3.40      3.6
-## 9     4.4   2.867   3.40      4.2
-## 10    1.4   1.467   2.05      4.0
-## 11    2.0   2.400   2.55      3.6
-## 12    3.0   3.000   3.00      2.0
-## 13    3.0   2.667   2.60      3.4
-## 15    1.8   1.867   2.35      3.6
-## 16    3.4   3.000   2.95      3.6
-## 17    3.6   4.067   4.10      1.6
-## 19    2.6   3.400   3.00      3.4
-## 20    2.2   1.733   1.85      2.4
-## 21    2.8   1.933   2.70      1.2
-## 22    2.2   1.800   2.15      3.6
-## 23    5.0   4.533   4.35      1.4
-## 24    4.4   4.267   4.05      1.6
-## 25    1.8   1.867   2.10      4.0
-## 26    2.0   2.267   3.35      4.8
-## 27    2.2   2.400   2.30      3.0
-## 28    4.0   2.667   3.60      4.4
-## 29    3.4   4.400   4.35      3.0
-## 30    4.2   3.267   3.25      2.4
-## 31    1.8   2.067   2.20      5.0
-## 32    2.2   3.000   3.00      2.4
-## 33    3.4   3.200   3.70      3.4
-## 34    2.8   3.400   3.00      2.8
-## 35    3.4   4.133   3.90      2.8
-## 36    3.6   4.000   4.00      3.2
-## 37    3.2   3.933   3.95      3.6
-## 38    1.8   1.933   2.20      4.2
-## 39    3.2   3.333   3.40      2.2
-## 40    4.6   2.600   3.55      3.6
-## 41    1.2   1.000   1.75      2.6
-## 42    2.2   2.067   2.60      3.2
-```
-
-```r
 library('dplyr') # to call the count command
 ```
 
@@ -986,6 +700,31 @@ library('dplyr') # to call the count command
 ```
 
 ```r
+AgeFreq.noEighty <- count(MergedData.filt, Age)
+AgeFreq.noEighty
+```
+
+```
+## # A tibble: 14 x 2
+##      Age     n
+##    <int> <int>
+##  1    19   107
+##  2    20   117
+##  3    21   117
+##  4    22   122
+##  5    23   118
+##  6    24   119
+##  7    25   134
+##  8    28   551
+##  9    32   472
+## 10    38   410
+## 11    45   741
+## 12    55   623
+## 13    68   207
+## 14    80    26
+```
+
+```r
 AgeFreq<- count(MergedData.filt.b, Age) #Generates frequency table.  
 AgeFreq #Verifies under 18 and 80 outlier is removed.
 ```
@@ -1009,15 +748,229 @@ AgeFreq #Verifies under 18 and 80 outlier is removed.
 ## 13    68   207
 ```
 
-#4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
-
-
-
-##TODO Properly title DP and AIP without abbreviations.
-
-#5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
 
 ```r
+#4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
+
+library(pastecs)
+```
+
+```
+## Warning: package 'pastecs' was built under R version 3.4.3
+```
+
+```
+## Loading required package: boot
+```
+
+```
+## 
+## Attaching package: 'pastecs'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     first, last
+```
+
+```
+## The following objects are masked from 'package:data.table':
+## 
+##     first, last
+```
+
+```r
+dfTemp <- MergedData.filt.b
+attach(dfTemp)
+```
+
+```
+## The following objects are masked _by_ .GlobalEnv:
+## 
+##     Country, HDI
+```
+
+```r
+dfTemp <- cbind(Age, AnnualIncome, as.double(HDI), DP1, AIP1, GP1, SWLS1)
+```
+
+```
+## Warning in cbind(Age, AnnualIncome, as.double(HDI), DP1, AIP1, GP1, SWLS1):
+## number of rows of result is not a multiple of vector length (arg 3)
+```
+
+```r
+colnames(dfTemp) <- c("Age", "AnnualIncome", "HDI", "DPMean", "AIPMean","GPMean", "SWLSMean")
+options(scipen=100)
+options(digits=0)
+#stat.desc(dfTemp, basic=F)
+stat.desc(dfTemp) #Provides statistical data.
+```
+
+```
+##                 Age AnnualIncome  HDI DPMean AIPMean GPMean SWLSMean
+## nbr.val        3838         3492 3838   3838    3838   3838     3838
+## nbr.null          0            0    0      0       0      0        0
+## nbr.na            0          346    0      0       0      0        0
+## min              19        10000    0      1       1      1        1
+## max              68       250000    1      5       5      5        5
+## range            49       240000    1      4       4      4        4
+## sum          146232    207785000 2692  12988    7850  14104    11316
+## median           38        45000    1      3       2      4        3
+## mean             38        59503    1      3       2      4        3
+## SE.mean           0          931    0      0       0      0        0
+## CI.mean.0.95      0         1825    0      0       0      0        0
+## var             180   3025272262    0      1       1      1        1
+## std.dev          13        55002    0      1       1      1        1
+## coef.var          0            1    0      0       1      0        0
+```
+
+```r
+dfTemp <- cbind(Age, AnnualIncome)
+dfTemp <- data.frame(dfTemp)
+
+
+hist(dfTemp$Age, ylim = c(0,800), main="Age Frequency Distribution", 
+     xlab="Age", border="blue", ylab = "Age Frequency", col="lightgreen") 
+```
+
+![](CS2_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
+```r
+# Age distribution is skewed right with the bulk of the age between 20 and 45.
+
+hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution", 
+     xlab="Income", border="blue", ylab = "Income Frequency", col="lightgreen") 
+```
+
+![](CS2_files/figure-html/unnamed-chunk-10-2.png)<!-- -->
+
+```r
+# Income distribution is skewed right with the bulk of the income between 0 and 100,000.
+detach(dfTemp)
+```
+
+
+```r
+#4c. Give the frequencies (in table format or similar) for Gender, Work Status, and Occupation. They can be separate tables, if that’s your choice.
+
+library('dplyr') # to call the count command
+GenderCount <- count(MergedData.filt.b, Gender)
+WorkStatusCount <- count(MergedData.filt.b, WorkStatus)
+OccupationCount <- count(MergedData.filt.b, Occupation)
+GenderCount
+```
+
+```
+## # A tibble: 3 x 2
+##   Gender     n
+##   <fctr> <int>
+## 1 Female  2191
+## 2   Male  1642
+## 3   <NA>     5
+```
+
+```r
+WorkStatusCount
+```
+
+```
+## # A tibble: 6 x 2
+##   WorkStatus     n
+##       <fctr> <int>
+## 1               24
+## 2  full-time  2196
+## 3  part-time   451
+## 4    retired   141
+## 5    student   787
+## 6 unemployed   239
+```
+
+```r
+OccupationCount
+```
+
+```
+## # A tibble: 617 x 2
+##                             Occupation     n
+##                                  <chr> <int>
+##  1 'Utterlyshiftlessartsstudent'...atp     1
+##  2                                 abc     1
+##  3                          Accountant     2
+##  4                          Accounting     2
+##  5                 AccountingAssistant     1
+##  6                   AccountingManager     2
+##  7                      AccountManager     1
+##  8                      accountplanner     1
+##  9                   AccountServiceRep     1
+## 10                     AccountsPayable     1
+## # ... with 607 more rows
+```
+
+
+```r
+#4d. Give the counts (again, pretty table) of how many participants per country in descending order.
+library(dplyr)
+dfTempCounts <- MergedData.filt.b
+attach(dfTempCounts)
+```
+
+```
+## The following objects are masked _by_ .GlobalEnv:
+## 
+##     Country, HDI
+```
+
+```r
+ dfTempCounts %>% select(Country) %>% group_by(Country) %>% 
+  dplyr::summarise(Participant_Count = n()) %>% 
+  plyr::arrange(desc(Participant_Count))
+```
+
+```
+## # A tibble: 81 x 2
+##          Country Participant_Count
+##            <chr>             <int>
+##  1  UnitedStates              2767
+##  2        Canada               243
+##  3 UnitedKingdom               177
+##  4     Australia                99
+##  5         India                78
+##  6         Italy                60
+##  7       Germany                36
+##  8        Brazil                20
+##  9       Ireland                19
+## 10        Israel                19
+## # ... with 71 more rows
+```
+
+
+```r
+#4e. There are two variables in the set: whether the person considers themselves a procrastinator (yes/no) and whether others consider them a procrastinator (yes/no). How many people matched their perceptions to others’ (so, yes/yes and no/no)? To clarify: how many people said they felt they were procrastinators and also said others thought they were procrastinators? Likewise, how many said they were not procrastinators and others also did not think they were procrastinators?
+
+  x <- MergedData.filt.b %>% select(Q1Self, Q2Others)
+  x$Q1Self <- as.character(x$Q1Self)#self Responce
+  x$Q2Others <- as.character(x$Q2Others)#other views
+  
+  x %>% select(Q1Self,Q2Others) %>% ungroup() %>%#ungroup responces
+  filter(base::nchar(Q1Self)>0 & base::nchar(Q2Others)>0) %>% #filters Q1self and Q2Others responces
+  filter(Q1Self==Q2Others) %>% group_by(Q1Self) %>% #compares Q1 abd Q2 to eachother
+  dplyr::summarise(InAgreement_Count = n()) %>% 
+  rename(InAgreement = Q1Self)
+```
+
+```
+## # A tibble: 2 x 2
+##   InAgreement InAgreement_Count
+##         <chr>             <int>
+## 1          no               451
+## 2         yes              2255
+```
+
+
+```r
+#5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
 library(ggplot2)
 library(RColorBrewer)
 library(dplyr)
@@ -1031,17 +984,16 @@ Des <- head(desOrder, n=15) #Assigns 15 entries only
 ggplot(data=Des, aes(x=reorder(Country, -CAIPMean), y=CAIPMean, fill=Category)) +
 geom_bar(stat = "identity")+
 theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
-ylab("AIPMean") + ggtitle("AIP Mean by Top 15 Countries")+
+ylab("AIPMean") + ggtitle("Adult Inventory of Procrastication(AIP) Mean by Top 15 Countries")+
 scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](CS2_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
-
-#5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
+![](CS2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 
 ```r
+#5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
 CountryDPMean <- summarize(ByCountry,CDPMean = mean(DPMean)) # Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
 CountryDPMean <- rename(CountryDPMean, 'Country' = 'MergedData.filt.b$Country') #rename so we can merge by country
 CountryDPMean.Cat <- merge(CountryDPMean, CountryHDI, by=c('Country')) #Attaches Categry to countries
@@ -1050,17 +1002,17 @@ Des.DP <- head(desOrder.DP, n=15) #Assigns 15 entries only
 ggplot(data=Des.DP, aes(x=reorder(Country, -CDPMean), y=CDPMean, fill=Category)) +
 geom_bar(stat = "identity")+
 theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
-ylab("DPMean") + ggtitle("DP Mean by Top 15 Countries")+
+ylab("DPMean") + ggtitle("Decisional Procrastination Scale (DP) Mean by Top 15 Countries")+
   scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](CS2_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
-
-#5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
+![](CS2_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 
 ```r
+#5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
+
 ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIncome, color=Gender)) + 
   geom_point(size = 1, na.rm=TRUE) + 
   labs(title = "Relationship between Income and Age by Gender") + 
@@ -1068,47 +1020,80 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](CS2_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
-
-
-#5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
-
+![](CS2_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
 ##TODO RELABEL ALL CHARTS WITH MEANINGFULL TITLES.
 
 ```r
+#5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
+
 ggplot(MergedData.filt.b, aes(x = HDI, y = SWLSMean)) + 
   geom_point(colour = 'red', size = 1, na.rm=TRUE) + 
-  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  labs(title = "Relationship between Human Development Index(HDI) and Life Satisfaction (SWLS)") + 
   geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](CS2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](CS2_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 #5e Barplot
 
 ```r
+#5e Barplot
+
 ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) + 
-  geom_bar(stat = "identity", fill='red', na.rm=TRUE) 
-```
-
-![](CS2_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
-
-```r
-  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  geom_bar(stat = "identity", fill='red', na.rm=TRUE) +
+  labs(title = "Relationship between Human Development Index(HDI) & Life Satisfaction (SWLS)") + 
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-```
-## NULL
-```
+![](CS2_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
+
+```r
 #6 Outputting to CSV format – Make sure there are no index numbers (10%)
-a The client would like the finalized HDI table (3A and 3B)
-b The client would like the Tidied version of the original input to be output in the repository, including the merged HDI data (3C).
-c The client would like a dataset (or two) that shows the Top 15 nations (in 5B and 5C), as well as their HDI scores.
-d All output should be in plain English or translated in the Codebook.
-
 #6a The client would like the finalized HDI table (3A and 3B)
 
+library(gridExtra)
+```
 
+```
+## Warning: package 'gridExtra' was built under R version 3.4.3
+```
+
+```
+## 
+## Attaching package: 'gridExtra'
+```
+
+```
+## The following object is masked from 'package:dplyr':
+## 
+##     combine
+```
+
+```r
+pdf(file = "HDI.pdf", height = 54, width = 7)
+grid.table(CountryHDI, cols = colnames(CountryHDI), rows = NULL)
+dev.off()
+```
+
+```
+## png 
+##   2
+```
+
+
+```r
+#6b. The client would like the Tidied version of the original input to be output in the repository, including the merged HDI data (3C).
+
+write.csv(MergedData.filt.b, file = "MergedDataProcrastinationHDI.csv",row.names=FALSE)
+```
+
+
+```r
+#6c The client would like a dataset (or two) that shows the Top 15 nations (in 5B and 5C), as well as their HDI scores.
+
+library(dplyr)
+Des.DP.ColsRemoved <- select(Des.DP, Country, CDPMean, HDI)
+write.csv(Des.DP.ColsRemoved, file = "Top15CountriesHDI.csv",row.names=FALSE)
+```
