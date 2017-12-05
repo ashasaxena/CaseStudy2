@@ -247,7 +247,6 @@ attach(dfTempCounts)
 
 
 
-##TODO Properly title DP and AIP without abbreviations.
 
 
 ```{r}
@@ -265,7 +264,7 @@ Des <- head(desOrder, n=15) #Assigns 15 entries only
 ggplot(data=Des, aes(x=reorder(Country, -CAIPMean), y=CAIPMean, fill=Category)) +
 geom_bar(stat = "identity")+
 theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
-ylab("AIPMean") + ggtitle("AIP Mean by Top 15 Countries")+
+ylab("AIPMean") + ggtitle("Adult Inventory of Procrastication(AIP) Mean by Top 15 Countries")+
 scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -282,7 +281,7 @@ Des.DP <- head(desOrder.DP, n=15) #Assigns 15 entries only
 ggplot(data=Des.DP, aes(x=reorder(Country, -CDPMean), y=CDPMean, fill=Category)) +
 geom_bar(stat = "identity")+
 theme(axis.text.x=element_text(angle=90,vjust=0.5)) + xlab("Country") +
-ylab("DPMean") + ggtitle("DP Mean by Top 15 Countries")+
+ylab("DPMean") + ggtitle("Decisional Procrastination Scale (DP) Mean by Top 15 Countries")+
   scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -309,7 +308,7 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
 
 ggplot(MergedData.filt.b, aes(x = HDI, y = SWLSMean)) + 
   geom_point(colour = 'red', size = 1, na.rm=TRUE) + 
-  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  labs(title = "Relationship between Human Development Index(HDI) and Life Satisfaction (SWLS)") + 
   geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -318,8 +317,8 @@ ggplot(MergedData.filt.b, aes(x = HDI, y = SWLSMean)) +
 #5e Barplot
 
 ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) + 
-  geom_bar(stat = "identity", fill='red', na.rm=TRUE) 
-  labs(title = "Relationship between HDI and Life Satisfaction") + 
+  geom_bar(stat = "identity", fill='red', na.rm=TRUE) +
+  labs(title = "Relationship between Human Development Index(HDI) & Life Satisfaction (SWLS)") + 
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
