@@ -12,16 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-
-
 ```{r}
 #2a Read the csv into R and take a look at the data set. Output how many rows and columns the data.frame is.
 PD <- read.csv("Procrastination.csv")
 dim(PD) #results in printing the number of rows then the number of columns.
 ```
-
-
-
 
 ```{r}
 #2b The column names are either too much or not enough. Change the column names so that they do not have spaces, underscores, slashes, and the like. All column names should be under 12 characters. Make sure you’re updating your codebook with information on the tidied data set as well.
@@ -32,10 +27,6 @@ library(data.table)
 PD.renamed <- setnames(PD, old=OldNames, new=c("Age", "Gender", "Kids", "Education","WorkStatus","AnnualIncome", "Occupation", "Years", "Months", "Community", "Country", "Status", "NumSon", "NumDaught", "DP1", "DP2","DP3","DP4","DP5","AIP1","AIP2","AIP3","AIP4","AIP5","AIP6","AIP7","AIP8","AIP9","AIP10","AIP11","AIP12","AIP13","AIP14","AIP15", "GP1", "GP2", "GP3", "GP4", "GP5", "GP6", "GP7", "GP8", "GP9", "GP10", "GP11", "GP12", "GP13", "GP14", "GP15", "GP16", "GP17", "GP18", "GP19", "GP20", "SWLS1", "SWLS2", "SWLS3", "SWLS4", "SWLS5","Q1Self","Q2Others"))
 head(PD.renamed)
 ```
-
-
-
-
 
 
 ## This is the part where the rationale for combining "teachers" needs to be explained.
@@ -82,8 +73,6 @@ d[grepl("ducation", d, ignore.case=FALSE)] <- "Educator"
 PD.renamed$Occupation <- d
 ```
 
-
-
 ```{r}
 #2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
 
@@ -94,7 +83,6 @@ PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59]) #Creates column for mean of all
 PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 3) #Round DP, AIP, GP, and SWLS means to 1 digit.
 head(PD.renamed[,62:65])
 ```
-
 
 ```{r, echo = TRUE}
 ##3 SCRAPING
@@ -120,8 +108,6 @@ CountryHDI
 ## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
-
-
 ```{r}
 #3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.
 
@@ -132,9 +118,6 @@ CountryHDI$Category <- cut(CountryHDI$HDI,
 CountryHDI
 write.csv(CountryHDI, file = "CountryHDI.csv") #Creates csv file
 ```
-
-
-
 
 ```{r}
 #3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).
@@ -147,9 +130,6 @@ CountryHDI$Country[CountryHDI$Country == "AntiguaandBarbuda"] <- "Antigua"
 MergedData <- merge(CountryHDI, PD.renamed, by=c('Country'))
 head(MergedData)
 ```
-
-
-
 
 ```{r}
 #Code to identify country mismatches after merge including NA's.
@@ -165,8 +145,6 @@ a
 ```
 #Comment:  The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)
 
-
-
 ```{r}
 #4a Remove all observations where the participant is under age 18. No further analysis of underage individuals is permitted by your client. Remove any other age outliers as you see fit, but be sure to tell what you’re doing and why.
 
@@ -180,8 +158,6 @@ AgeFreq.noEighty
 AgeFreq<- count(MergedData.filt.b, Age) #Generates frequency table.  
 AgeFreq #Verifies under 18 and 80 outlier is removed.
 ```
-
-
 
 ```{r}
 #4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
@@ -212,8 +188,6 @@ hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution",
 detach(dfTemp)
 ```
 
-
-
 ```{r}
 #4c. Give the frequencies (in table format or similar) for Gender, Work Status, and Occupation. They can be separate tables, if that’s your choice.
 
@@ -225,8 +199,6 @@ GenderCount
 WorkStatusCount
 OccupationCount
 ```
-
-
 
 ```{r}
 #4d. Give the counts (again, pretty table) of how many participants per country in descending order.
@@ -253,11 +225,6 @@ attach(dfTempCounts)
   rename(InAgreement = Q1Self)
 ```
 
-
-
-
-
-
 ```{r}
 #5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
 library(ggplot2)
@@ -278,8 +245,6 @@ scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-
-
 ```{r}
 #5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
 CountryDPMean <- summarize(ByCountry,CDPMean = mean(DPMean)) # Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
@@ -295,8 +260,6 @@ ylab("DPMean") + ggtitle("Decisional Procrastination Scale (DP) Mean by Top 15 C
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-
-
 ```{r}
 #5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
 
@@ -306,10 +269,6 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
   geom_smooth(method=lm, se=FALSE, size = 1, na.rm=TRUE)+   #adds linear fit model to more clearly see patterns.
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
-
-
-
 
 ##TODO RELABEL ALL CHARTS WITH MEANINGFULL TITLES.
 ```{r}
@@ -331,7 +290,6 @@ ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-
 ```{r}
 #6 Outputting to CSV format – Make sure there are no index numbers (10%)
 #6a The client would like the finalized HDI table (3A and 3B)
@@ -342,14 +300,11 @@ grid.table(CountryHDI, cols = colnames(CountryHDI), rows = NULL)
 dev.off()
 ```
 
-
 ```{r}
 #6b. The client would like the Tidied version of the original input to be output in the repository, including the merged HDI data (3C).
 
 write.csv(MergedData.filt.b, file = "MergedDataProcrastinationHDI.csv",row.names=FALSE)
 ```
-
-
 
 ```{r}
 #6c The client would like a dataset (or two) that shows the Top 15 nations (in 5B and 5C), as well as their HDI scores.
