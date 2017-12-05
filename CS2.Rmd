@@ -10,7 +10,10 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Background and Objective
+## United Nations Development Program provided procrastination data set and required us to review the impact of variables such as Human Development Index (HDI), age and income to evaluate the emphasize that people and their capabilities should be the ultimate criteria for assessing the development of a country, not economic growth alone. 
 
+#Step 1: Data Profiling and Cleansing
 
 ```{r}
 #2a Read the csv into R and take a look at the data set. Output how many rows and columns the data.frame is.
@@ -29,7 +32,7 @@ head(PD.renamed)
 ```
 
 
-## This is the part where the rationale for combining "teachers" needs to be explained.
+## Data Consolidation and profiling continues: We combine occupation here specifically "teachers", label Male (1) and Female (2)
 ```{r}
 #2c. Some columns are, due to Qualtrics, malfunctioning. Prime examples are the following columns: “How long have you held this position?: Years”, Country of residence, Number of sons, and Current Occupation.
 
@@ -73,6 +76,7 @@ d[grepl("ducation", d, ignore.case=FALSE)] <- "Educator"
 PD.renamed$Occupation <- d
 ```
 
+## Calulations and Logic: creating new columns with mean calculations and rounding digits
 ```{r}
 #2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
 
@@ -83,6 +87,8 @@ PD.renamed$SWLSMean=rowMeans(PD.renamed[,55:59]) #Creates column for mean of all
 PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 3) #Round DP, AIP, GP, and SWLS means to 1 digit.
 head(PD.renamed[,62:65])
 ```
+
+#Step 2: Data Ingestion: Scraping the data from the specified to bring in the HDI metrics
 
 ```{r, echo = TRUE}
 ##3 SCRAPING
@@ -119,6 +125,8 @@ CountryHDI
 write.csv(CountryHDI, file = "CountryHDI.csv") #Creates csv file
 ```
 
+### Data Merge: combining the two data sets so we can start the analysis
+
 ```{r}
 #3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).
 
@@ -130,6 +138,8 @@ CountryHDI$Country[CountryHDI$Country == "AntiguaandBarbuda"] <- "Antigua"
 MergedData <- merge(CountryHDI, PD.renamed, by=c('Country'))
 head(MergedData)
 ```
+
+## Data profiling and cleaning continues with looking for unique data elements such as unique and misspelled country's
 
 ```{r}
 #Code to identify country mismatches after merge including NA's.
@@ -145,6 +155,8 @@ a
 ```
 #Comment:  The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)
 
+## Continue cleaning data by removing 18 and under and 80 and above members of the data set as we are looking for income, age and HDI score relation
+
 ```{r}
 #4a Remove all observations where the participant is under age 18. No further analysis of underage individuals is permitted by your client. Remove any other age outliers as you see fit, but be sure to tell what you’re doing and why.
 
@@ -158,6 +170,8 @@ AgeFreq.noEighty
 AgeFreq<- count(MergedData.filt.b, Age) #Generates frequency table.  
 AgeFreq #Verifies under 18 and 80 outlier is removed.
 ```
+
+#Step 2: Data Analysis: Descriptive Analysis with data visualization. 
 
 ```{r}
 #4b. Please provide (in pretty-fied table format or similar), descriptive statistics on Age, Income, HDI, and the four mean columns (DP, etc.). Create a simple histogram for two of these seven variables. Comment on the shape of the distribution in your markdown.
@@ -188,6 +202,8 @@ hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution",
 detach(dfTemp)
 ```
 
+## Data Analysis and visualization continues: we review the co-relation between Gender, Work Status, and Occupation
+
 ```{r}
 #4c. Give the frequencies (in table format or similar) for Gender, Work Status, and Occupation. They can be separate tables, if that’s your choice.
 
@@ -199,6 +215,7 @@ GenderCount
 WorkStatusCount
 OccupationCount
 ```
+## Data Analysis with visualization: narrowed to 15 countries as we start to find some answers here
 
 ```{r}
 #4d. Give the counts (again, pretty table) of how many participants per country in descending order.
@@ -210,6 +227,8 @@ attach(dfTempCounts)
   dplyr::summarise(Participant_Count = n()) %>% 
   plyr::arrange(desc(Participant_Count))
 ```
+
+## Data Analysis continues with the procastination variable and how that affects other variables
 
 ```{r}
 #4e. There are two variables in the set: whether the person considers themselves a procrastinator (yes/no) and whether others consider them a procrastinator (yes/no). How many people matched their perceptions to others’ (so, yes/yes and no/no)? To clarify: how many people said they felt they were procrastinators and also said others thought they were procrastinators? Likewise, how many said they were not procrastinators and others also did not think they were procrastinators?
@@ -224,6 +243,8 @@ attach(dfTempCounts)
   dplyr::summarise(InAgreement_Count = n()) %>% 
   rename(InAgreement = Q1Self)
 ```
+
+## Further Analysis: we look at the procastination score for the top 15 nations in descending order 
 
 ```{r}
 #5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
@@ -245,6 +266,8 @@ scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+#Step 3: Data Visualization: Focusing on visualizing our data with the focus of three variabes DP, AIP and GP
+
 ```{r}
 #5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
 CountryDPMean <- summarize(ByCountry,CDPMean = mean(DPMean)) # Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
@@ -259,6 +282,8 @@ ylab("DPMean") + ggtitle("Decisional Procrastination Scale (DP) Mean by Top 15 C
   scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+#Step 4: Findings: Relationship between Age and Income
 
 ```{r}
 #5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
