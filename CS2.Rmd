@@ -186,7 +186,7 @@ colnames(dfTemp) <- c("Age", "AnnualIncome", "HDI", "DPMean", "AIPMean","GPMean"
 options(scipen=100)
 options(digits=0)
 #stat.desc(dfTemp, basic=F)
-stat.desc(dfTemp)
+stat.desc(dfTemp) #Provides statistical data.
 dfTemp <- cbind(Age, AnnualIncome)
 dfTemp <- data.frame(dfTemp)
 
@@ -202,6 +202,13 @@ hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution",
 # Income distribution is skewed right with the bulk of the income between 0 and 100,000.
 detach(dfTemp)
 ```
+
+```{r}
+#4c. Give the frequencies (in table format or similar) for Gender, Work Status, and Occupation. They can be separate tables, if that’s your choice.
+
+```
+
+
 
 ```{r}
 #4d. Give the counts (again, pretty table) of how many participants per country in descending order.
