@@ -160,7 +160,7 @@ head(PD.renamed[,62:65])
 ```r
 ##3 SCRAPING
 #3a Scraped Country and HDI
-
+options(digits=3)
 library('rvest') # grab and parse HTML
 ```
 
@@ -176,11 +176,36 @@ webpage <- read_html(url)#Reading the HTML code from the website
 
 #Using XPath selectors to scrap the Country and HDI of first 8 tables
 Country<-webpage%>%html_nodes("h3+ div .wikitable:nth-child(1) td:nth-child(3)")%>%html_text()
-HDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
+TempHDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
+HDI <- as.numeric(TempHDI)
+HDI
+```
 
-###  WILL NEED TO FIX "WORLD" ENTRY
+```
+##   [1] 0.949 0.939 0.939 0.926 0.925 0.925 0.924 0.923 0.921 0.920 0.920
+##  [12] 0.917 0.915 0.913 0.912 0.909 0.903 0.901 0.899 0.898 0.897 0.896
+##  [23] 0.895 0.893 0.890 0.887 0.884 0.878 0.866 0.865 0.865 0.858 0.856
+##  [34] 0.856 0.856 0.855 0.848 0.847 0.847 0.845 0.843 0.840 0.836 0.830
+##  [45] 0.827 0.827 0.824 0.807 0.804 0.802 0.800 0.796 0.796 0.795 0.795
+##  [56] 0.794 0.794 0.792 0.789 0.788 0.788 0.786 0.782 0.781 0.780 0.776
+##  [67] 0.776 0.775 0.774 0.769 0.767 0.767 0.766 0.765 0.764 0.763 0.762
+##  [78] 0.759 0.754 0.754 0.750 0.748 0.745 0.743 0.743 0.741 0.740 0.740
+##  [89] 0.739 0.738 0.736 0.735 0.735 0.730 0.727 0.726 0.725 0.725 0.722
+## [100] 0.722 0.721 0.717 0.716 0.706 0.704 0.701 0.701 0.699 0.698 0.697
+## [111] 0.693 0.691 0.691 0.689 0.684 0.683 0.682 0.680 0.674 0.666 0.664
+## [122] 0.649 0.648 0.647 0.645 0.640 0.640 0.638 0.638 0.627 0.625 0.624
+## [133] 0.607 0.605 0.597 0.592 0.592 0.588 0.586 0.579 0.579 0.579 0.574
+## [144] 0.563 0.558 0.556 0.555 0.550 0.541 0.536 0.533 0.531 0.527 0.518
+## [155] 0.516 0.516 0.515 0.513 0.512 0.498 0.497 0.497 0.494 0.493 0.493
+## [166] 0.490 0.487 0.485 0.482 0.479 0.476 0.474 0.473 0.452 0.448 0.442
+## [177] 0.435 0.427 0.424 0.420 0.420 0.418 0.418 0.414 0.404 0.402 0.396
+## [188] 0.353 0.352
+```
+
+```r
 CountryHDI <- data.frame(Country, HDI)#Convert to data frame.
-CountryHDI$HDI <- as.numeric(as.character(CountryHDI$HDI)) #Changes to numeric so we can later categorize
+CountryHDI$HDI <- as.character(CountryHDI$HDI) #),digits=3) #Changes to numeric so we can later categorize
+CountryHDI$HDI <- as.numeric(CountryHDI$HDI)
 CountryHDI$Country <- as.character(CountryHDI$Country)
 CountryHDI
 ```
@@ -376,10 +401,6 @@ CountryHDI
 ## 187                               Chad 0.396
 ## 188                              Niger 0.353
 ## 189           Central African Republic 0.352
-```
-
-```r
-## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
 ##A minor adjustment was added to the table at the request of the client to add the HDI category as specified in the website.  The code and table is shown below.
@@ -644,12 +665,12 @@ head(MergedData)
 ## 5   5    1    3    4    5    5    5    4    3    4    4    4     3     3
 ## 6   4    1    2    4    4    4    4    4    4    3    4    4     3     4
 ##   SWLS3 SWLS4 SWLS5 Q1Self Q2Others DPMean AIPMean GPMean SWLSMean
-## 1     2     3     2    yes       no    3.2   2.667    3.2      2.4
-## 2     1     3     1     no      yes    3.2   3.067    2.8      1.4
-## 3     3     3     2    yes       no    3.0   2.733    3.2      2.8
-## 4     2     2     2    yes      yes    3.6   3.867    3.7      2.4
-## 5     3     4     2    yes       no    3.4   2.067    3.9      3.0
-## 6     3     5     4    yes       no    2.4   2.400    3.0      3.8
+## 1     2     3     2    yes       no    3.2    2.67    3.2      2.4
+## 2     1     3     1     no      yes    3.2    3.07    2.8      1.4
+## 3     3     3     2    yes       no    3.0    2.73    3.2      2.8
+## 4     2     2     2    yes      yes    3.6    3.87    3.7      2.4
+## 5     3     4     2    yes       no    3.4    2.07    3.9      3.0
+## 6     3     5     4    yes       no    2.4    2.40    3.0      3.8
 ```
 
 ## During this step unique country names were discovered.  Several were listed as "NA" indicating that the country was simply not provided, or missing, in the data.   There were seveal country names that were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China).  This was merely a tool to confirm a valid data merge and may be seen below with the output of exceptions. 
@@ -1076,7 +1097,8 @@ ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) +
 
 ![](CS2_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
-## Output files
+#Output files:
+##JAA has provided three output files, as requested, for reference by the client: 1. HDI.pdf which indicates 
 
 ```r
 #6 Outputting to CSV format – Make sure there are no index numbers (10%)

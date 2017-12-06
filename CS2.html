@@ -257,7 +257,7 @@ head(PD.renamed[,62:65])</code></pre>
 <h2>In order to compare country procrastination data to HDI, JAA then proceeded to scrape the HDI data from the website specified by the client (<a href="https://en.wikipedia.org/wiki/List_of_countries_by_Human_Development_Index#Complete_list_of_countries" class="uri">https://en.wikipedia.org/wiki/List_of_countries_by_Human_Development_Index#Complete_list_of_countries</a>), which provided the HDI by country and a categorization based on the HDI value. Below is the associated code, scraped country and ordered HDI table.</h2>
 <pre class="r"><code>##3 SCRAPING
 #3a Scraped Country and HDI
-
+options(digits=3)
 library('rvest') # grab and parse HTML</code></pre>
 <pre><code>## Loading required package: xml2</code></pre>
 <pre class="r"><code>#Specifying the url for desired website to be scrapped
@@ -267,11 +267,30 @@ webpage &lt;- read_html(url)#Reading the HTML code from the website
 
 #Using XPath selectors to scrap the Country and HDI of first 8 tables
 Country&lt;-webpage%&gt;%html_nodes(&quot;h3+ div .wikitable:nth-child(1) td:nth-child(3)&quot;)%&gt;%html_text()
-HDI&lt;-webpage%&gt;%html_nodes(&quot;h3+ div td:nth-child(4)&quot;)%&gt;%html_text()
-
-###  WILL NEED TO FIX &quot;WORLD&quot; ENTRY
-CountryHDI &lt;- data.frame(Country, HDI)#Convert to data frame.
-CountryHDI$HDI &lt;- as.numeric(as.character(CountryHDI$HDI)) #Changes to numeric so we can later categorize
+TempHDI&lt;-webpage%&gt;%html_nodes(&quot;h3+ div td:nth-child(4)&quot;)%&gt;%html_text()
+HDI &lt;- as.numeric(TempHDI)
+HDI</code></pre>
+<pre><code>##   [1] 0.949 0.939 0.939 0.926 0.925 0.925 0.924 0.923 0.921 0.920 0.920
+##  [12] 0.917 0.915 0.913 0.912 0.909 0.903 0.901 0.899 0.898 0.897 0.896
+##  [23] 0.895 0.893 0.890 0.887 0.884 0.878 0.866 0.865 0.865 0.858 0.856
+##  [34] 0.856 0.856 0.855 0.848 0.847 0.847 0.845 0.843 0.840 0.836 0.830
+##  [45] 0.827 0.827 0.824 0.807 0.804 0.802 0.800 0.796 0.796 0.795 0.795
+##  [56] 0.794 0.794 0.792 0.789 0.788 0.788 0.786 0.782 0.781 0.780 0.776
+##  [67] 0.776 0.775 0.774 0.769 0.767 0.767 0.766 0.765 0.764 0.763 0.762
+##  [78] 0.759 0.754 0.754 0.750 0.748 0.745 0.743 0.743 0.741 0.740 0.740
+##  [89] 0.739 0.738 0.736 0.735 0.735 0.730 0.727 0.726 0.725 0.725 0.722
+## [100] 0.722 0.721 0.717 0.716 0.706 0.704 0.701 0.701 0.699 0.698 0.697
+## [111] 0.693 0.691 0.691 0.689 0.684 0.683 0.682 0.680 0.674 0.666 0.664
+## [122] 0.649 0.648 0.647 0.645 0.640 0.640 0.638 0.638 0.627 0.625 0.624
+## [133] 0.607 0.605 0.597 0.592 0.592 0.588 0.586 0.579 0.579 0.579 0.574
+## [144] 0.563 0.558 0.556 0.555 0.550 0.541 0.536 0.533 0.531 0.527 0.518
+## [155] 0.516 0.516 0.515 0.513 0.512 0.498 0.497 0.497 0.494 0.493 0.493
+## [166] 0.490 0.487 0.485 0.482 0.479 0.476 0.474 0.473 0.452 0.448 0.442
+## [177] 0.435 0.427 0.424 0.420 0.420 0.418 0.418 0.414 0.404 0.402 0.396
+## [188] 0.353 0.352</code></pre>
+<pre class="r"><code>CountryHDI &lt;- data.frame(Country, HDI)#Convert to data frame.
+CountryHDI$HDI &lt;- as.character(CountryHDI$HDI) #),digits=3) #Changes to numeric so we can later categorize
+CountryHDI$HDI &lt;- as.numeric(CountryHDI$HDI)
 CountryHDI$Country &lt;- as.character(CountryHDI$Country)
 CountryHDI</code></pre>
 <pre><code>##                                Country   HDI
@@ -464,7 +483,6 @@ CountryHDI</code></pre>
 ## 187                               Chad 0.396
 ## 188                              Niger 0.353
 ## 189           Central African Republic 0.352</code></pre>
-<pre class="r"><code>## TODO need to fix &quot;world&quot; entry if teams decides it is necessary.</code></pre>
 </div>
 <div id="a-minor-adjustment-was-added-to-the-table-at-the-request-of-the-client-to-add-the-hdi-category-as-specified-in-the-website.-the-code-and-table-is-shown-below." class="section level2">
 <h2>A minor adjustment was added to the table at the request of the client to add the HDI category as specified in the website. The code and table is shown below.</h2>
@@ -717,12 +735,12 @@ head(MergedData)</code></pre>
 ## 5   5    1    3    4    5    5    5    4    3    4    4    4     3     3
 ## 6   4    1    2    4    4    4    4    4    4    3    4    4     3     4
 ##   SWLS3 SWLS4 SWLS5 Q1Self Q2Others DPMean AIPMean GPMean SWLSMean
-## 1     2     3     2    yes       no    3.2   2.667    3.2      2.4
-## 2     1     3     1     no      yes    3.2   3.067    2.8      1.4
-## 3     3     3     2    yes       no    3.0   2.733    3.2      2.8
-## 4     2     2     2    yes      yes    3.6   3.867    3.7      2.4
-## 5     3     4     2    yes       no    3.4   2.067    3.9      3.0
-## 6     3     5     4    yes       no    2.4   2.400    3.0      3.8</code></pre>
+## 1     2     3     2    yes       no    3.2    2.67    3.2      2.4
+## 2     1     3     1     no      yes    3.2    3.07    2.8      1.4
+## 3     3     3     2    yes       no    3.0    2.73    3.2      2.8
+## 4     2     2     2    yes      yes    3.6    3.87    3.7      2.4
+## 5     3     4     2    yes       no    3.4    2.07    3.9      3.0
+## 6     3     5     4    yes       no    2.4    2.40    3.0      3.8</code></pre>
 </div>
 <div id="during-this-step-unique-country-names-were-discovered.-several-were-listed-as-na-indicating-that-the-country-was-simply-not-provided-or-missing-in-the-data.-there-were-seveal-country-names-that-were-either-not-in-the-procrastination-set-not-listed-na-or-associated-with-another-country-ie-taiwanchina.-this-was-merely-a-tool-to-confirm-a-valid-data-merge-and-may-be-seen-below-with-the-output-of-exceptions." class="section level2">
 <h2>During this step unique country names were discovered. Several were listed as “NA” indicating that the country was simply not provided, or missing, in the data. There were seveal country names that were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China). This was merely a tool to confirm a valid data merge and may be seen below with the output of exceptions.</h2>
@@ -1008,8 +1026,11 @@ ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) +
   theme(plot.title = element_text(hjust = 0.5))</code></pre>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
-<div id="output-files" class="section level2">
-<h2>Output files</h2>
+</div>
+<div id="output-files" class="section level1">
+<h1>Output files:</h1>
+<div id="jaa-has-provided-three-output-files-as-requested-for-reference-by-the-client-1.-hdi.pdf-which-indicates" class="section level2">
+<h2>JAA has provided three output files, as requested, for reference by the client: 1. HDI.pdf which indicates</h2>
 <pre class="r"><code>#6 Outputting to CSV format – Make sure there are no index numbers (10%)
 #6a The client would like the finalized HDI table (3A and 3B)
 
