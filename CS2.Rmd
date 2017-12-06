@@ -1,5 +1,5 @@
 ---
-title: "CaseStudyTwo"
+title: "Procrastination and Human Devlopment"
 author: "Jim Park Asha Saxena Andrew Walch"
 date: "November 25, 2017"
 output: 
@@ -11,9 +11,12 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 # Background and Objective
-## United Nations Development Program provided procrastination data set and required us to review the impact of variables such as Human Development Index (HDI), age and income to evaluate the emphasize that people and their capabilities should be the ultimate criteria for assessing the development of a country, not economic growth alone. 
+## JAA Consultants LLC is pleased to provide this Procrastination and Human Devlopment report requesed by our client at the United Nations Development Program.   The purpose of this report is to provide a clean data set and prelimiary insights into the data for the United Nations.  The client has provided JAA with a procrastination data set including many individual observations from many countries.   At the core of this data is insight into four different procrastination tests given to the individuals.  JAA was then asked to combine Human Development Index data with the provided data set, then clean, provide some preliminary visuals, and a recommendation on how to proceed with a larger study to better understand the links between procrastination and Human Development.  Human Development Index (HDI), age and income may be used to evaluate the emphasis that people and their capabilities should be the ultimate criteria for assessing the development of a country, not economic growth alone. 
+
+## This report is structured in the followin steps:  1.  Data Profiling, Consolidation, and Cleansing, 2. Data Scraping and Merging, 3. Data Screening and Initial Analysis/Visualization, 4. Recommendations 
 
 #Step 1: Data Profiling and Cleansing
+## In this step JAA has conducted preliminary data exploration fromt the data provided (procrastination.csv) by the United Nations.  The data consists of 4,264 individual observations and 61 variables, all of which are fully explained in the Codebook.csv file provided as specified in Asha Saxena's Github account. 
 
 ```{r}
 #2a Read the csv into R and take a look at the data set. Output how many rows and columns the data.frame is.
@@ -88,7 +91,7 @@ PD.renamed[,62:65] <- round(PD.renamed[,62:65], digits = 3) #Round DP, AIP, GP, 
 head(PD.renamed[,62:65])
 ```
 
-#Step 2: Data Ingestion: Scraping the data from the specified to bring in the HDI metrics
+#Step 2: Data Scraping: Gather the data from the specified website to bring in the HDI metrics
 
 ```{r, echo = TRUE}
 ##3 SCRAPING
