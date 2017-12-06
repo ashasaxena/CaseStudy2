@@ -3,7 +3,10 @@ Jim Park Asha Saxena Andrew Walch
 November 25, 2017  
 
 
+# Background and Objective
+## United Nations Development Program provided procrastination data set and required us to review the impact of variables such as Human Development Index (HDI), age and income to evaluate the emphasize that people and their capabilities should be the ultimate criteria for assessing the development of a country, not economic growth alone. 
 
+#Step 1: Data Profiling and Cleansing
 
 
 ```r
@@ -80,7 +83,7 @@ head(PD.renamed)
 ```
 
 
-## This is the part where the rationale for combining "teachers" needs to be explained.
+## Data Consolidation and profiling continues: We combine occupation here specifically "teachers", label Male (1) and Female (2)
 
 ```r
 #2c. Some columns are, due to Qualtrics, malfunctioning. Prime examples are the following columns: “How long have you held this position?: Years”, Country of residence, Number of sons, and Current Occupation.
@@ -125,6 +128,7 @@ d[grepl("ducation", d, ignore.case=FALSE)] <- "Educator"
 PD.renamed$Occupation <- d
 ```
 
+## Calulations and Logic: creating new columns with mean calculations and rounding digits
 
 ```r
 #2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
@@ -146,6 +150,8 @@ head(PD.renamed[,62:65])
 ## 5    2.0   1.733   2.85      3.8
 ## 6    2.8   4.333   4.00      3.2
 ```
+
+#Step 2: Data Ingestion: Scraping the data from the specified to bring in the HDI metrics
 
 
 ```r
@@ -581,6 +587,8 @@ CountryHDI
 write.csv(CountryHDI, file = "CountryHDI.csv") #Creates csv file
 ```
 
+### Data Merge: combining the two data sets so we can start the analysis
+
 
 ```r
 #3c Merge this data frame to the Country of Residence column of Procrastination.csv so that your data now has an HDI column and HDI categories (Very high human development, etc.).
@@ -639,6 +647,8 @@ head(MergedData)
 ## 6     3     5     4    yes       no    2.4   2.400    3.0      3.8
 ```
 
+## Data profiling and cleaning continues with looking for unique data elements such as unique and misspelled country's
+
 
 ```r
 #Code to identify country mismatches after merge including NA's.
@@ -657,6 +667,8 @@ a
 ## [6] "Yugoslavia" "Columbia"   NA
 ```
 #Comment:  The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)
+
+## Continue cleaning data by removing 18 and under and 80 and above members of the data set as we are looking for income, age and HDI score relation
 
 
 ```r
@@ -747,6 +759,8 @@ AgeFreq #Verifies under 18 and 80 outlier is removed.
 ## 12    55   623
 ## 13    68   207
 ```
+
+#Step 2: Data Analysis: Descriptive Analysis with data visualization. 
 
 
 ```r
@@ -851,6 +865,8 @@ hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution",
 detach(dfTemp)
 ```
 
+## Data Analysis and visualization continues: we review the co-relation between Gender, Work Status, and Occupation
+
 
 ```r
 #4c. Give the frequencies (in table format or similar) for Gender, Work Status, and Occupation. They can be separate tables, if that’s your choice.
@@ -907,6 +923,7 @@ OccupationCount
 ## 10                     AccountsPayable     1
 ## # ... with 607 more rows
 ```
+## Data Analysis with visualization: narrowed to 15 countries as we start to find some answers here
 
 
 ```r
@@ -945,6 +962,8 @@ attach(dfTempCounts)
 ## # ... with 71 more rows
 ```
 
+## Data Analysis continues with the procastination variable and how that affects other variables
+
 
 ```r
 #4e. There are two variables in the set: whether the person considers themselves a procrastinator (yes/no) and whether others consider them a procrastinator (yes/no). How many people matched their perceptions to others’ (so, yes/yes and no/no)? To clarify: how many people said they felt they were procrastinators and also said others thought they were procrastinators? Likewise, how many said they were not procrastinators and others also did not think they were procrastinators?
@@ -967,6 +986,8 @@ attach(dfTempCounts)
 ## 1          no               451
 ## 2         yes              2255
 ```
+
+## Further Analysis: we look at the procastination score for the top 15 nations in descending order 
 
 
 ```r
@@ -991,6 +1012,8 @@ scale_fill_brewer(palette= "Spectral") +
 
 ![](CS2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
+#Step 3: Data Visualization: Focusing on visualizing our data with the focus of three variabes DP, AIP and GP
+
 
 ```r
 #5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
@@ -1008,6 +1031,8 @@ ylab("DPMean") + ggtitle("Decisional Procrastination Scale (DP) Mean by Top 15 C
 ```
 
 ![](CS2_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+
+#Step 4: Findings: Relationship between Age and Income
 
 
 ```r
