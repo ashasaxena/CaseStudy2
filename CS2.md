@@ -843,27 +843,42 @@ dfTemp <- cbind(Age, AnnualIncome, as.double(HDI), DP1, AIP1, GP1, SWLS1)
 ```r
 colnames(dfTemp) <- c("Age", "AnnualIncome", "HDI", "DPMean", "AIPMean","GPMean", "SWLSMean")
 options(scipen=100)
-options(digits=0)
+options(digits=3)
 #stat.desc(dfTemp, basic=F)
 stat.desc(dfTemp) #Provides statistical data.
 ```
 
 ```
-##                 Age AnnualIncome  HDI DPMean AIPMean GPMean SWLSMean
-## nbr.val        3838         3492 3838   3838    3838   3838     3838
-## nbr.null          0            0    0      0       0      0        0
-## nbr.na            0          346    0      0       0      0        0
-## min              19        10000    0      1       1      1        1
-## max              68       250000    1      5       5      5        5
-## range            49       240000    1      4       4      4        4
-## sum          146232    207785000 2692  12988    7850  14104    11316
-## median           38        45000    1      3       2      4        3
-## mean             38        59503    1      3       2      4        3
-## SE.mean           0          931    0      0       0      0        0
-## CI.mean.0.95      0         1825    0      0       0      0        0
-## var             180   3025272262    0      1       1      1        1
-## std.dev          13        55002    0      1       1      1        1
-## coef.var          0            1    0      0       1      0        0
+##                     Age   AnnualIncome       HDI     DPMean   AIPMean
+## nbr.val        3838.000       3492.000 3838.0000  3838.0000 3838.0000
+## nbr.null          0.000          0.000    0.0000     0.0000    0.0000
+## nbr.na            0.000        346.000    0.0000     0.0000    0.0000
+## min              19.000      10000.000    0.3520     1.0000    1.0000
+## max              68.000     250000.000    0.9490     5.0000    5.0000
+## range            49.000     240000.000    0.5970     4.0000    4.0000
+## sum          146232.000  207785000.000 2692.3240 12988.0000 7850.0000
+## median           38.000      45000.000    0.7300     3.0000    2.0000
+## mean             38.101      59503.150    0.7015     3.3841    2.0453
+## SE.mean           0.216        930.776    0.0025     0.0173    0.0192
+## CI.mean.0.95      0.424       1824.920    0.0049     0.0339    0.0376
+## var             179.518 3025272261.630    0.0239     1.1504    1.4136
+## std.dev          13.398      55002.475    0.1547     1.0725    1.1890
+## coef.var          0.352          0.924    0.2205     0.3169    0.5813
+##                  GPMean   SWLSMean
+## nbr.val       3838.0000  3838.0000
+## nbr.null         0.0000     0.0000
+## nbr.na           0.0000     0.0000
+## min              1.0000     1.0000
+## max              5.0000     5.0000
+## range            4.0000     4.0000
+## sum          14104.0000 11316.0000
+## median           4.0000     3.0000
+## mean             3.6748     2.9484
+## SE.mean          0.0172     0.0176
+## CI.mean.0.95     0.0337     0.0344
+## var              1.1306     1.1832
+## std.dev          1.0633     1.0877
+## coef.var         0.2893     0.3689
 ```
 
 ```r

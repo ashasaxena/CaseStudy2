@@ -189,7 +189,7 @@ attach(dfTemp)
 dfTemp <- cbind(Age, AnnualIncome, as.double(HDI), DP1, AIP1, GP1, SWLS1)
 colnames(dfTemp) <- c("Age", "AnnualIncome", "HDI", "DPMean", "AIPMean","GPMean", "SWLSMean")
 options(scipen=100)
-options(digits=0)
+options(digits=3)
 #stat.desc(dfTemp, basic=F)
 stat.desc(dfTemp) #Provides statistical data.
 dfTemp <- cbind(Age, AnnualIncome)
