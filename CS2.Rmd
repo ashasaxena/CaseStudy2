@@ -96,7 +96,7 @@ head(PD.renamed[,62:65])
 ```{r, echo = TRUE}
 ##3 SCRAPING
 #3a Scraped Country and HDI
-
+options(digits=3)
 library('rvest') # grab and parse HTML
 
 #Specifying the url for desired website to be scrapped
@@ -106,15 +106,16 @@ webpage <- read_html(url)#Reading the HTML code from the website
 
 #Using XPath selectors to scrap the Country and HDI of first 8 tables
 Country<-webpage%>%html_nodes("h3+ div .wikitable:nth-child(1) td:nth-child(3)")%>%html_text()
-HDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
+TempHDI<-webpage%>%html_nodes("h3+ div td:nth-child(4)")%>%html_text()
+HDI <- as.numeric(TempHDI)
+HDI
 
-###  WILL NEED TO FIX "WORLD" ENTRY
 CountryHDI <- data.frame(Country, HDI)#Convert to data frame.
-CountryHDI$HDI <- as.numeric(as.character(CountryHDI$HDI)) #Changes to numeric so we can later categorize
+CountryHDI$HDI <- as.character(CountryHDI$HDI) #),digits=3) #Changes to numeric so we can later categorize
+CountryHDI$HDI <- as.numeric(CountryHDI$HDI)
 CountryHDI$Country <- as.character(CountryHDI$Country)
 CountryHDI
 
-## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
 ##A minor adjustment was added to the table at the request of the client to add the HDI category as specified in the website.  The code and table is shown below.
@@ -318,7 +319,8 @@ ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-## Output files
+#Output files:
+##JAA has provided three output files, as requested, for reference by the client: 1. HDI.pdf which indicates 
 ```{r}
 #6 Outputting to CSV format – Make sure there are no index numbers (10%)
 #6a The client would like the finalized HDI table (3A and 3B)

@@ -1,12 +1,17 @@
-# CaseStudyTwo
+# Procrastination and Human Devlopment
 Jim Park Asha Saxena Andrew Walch  
-November 25, 2017  
+December 05, 2017  
 
 
 # Background and Objective
-## United Nations Development Program provided procrastination data set and required us to review the impact of variables such as Human Development Index (HDI), age and income to evaluate the emphasize that people and their capabilities should be the ultimate criteria for assessing the development of a country, not economic growth alone. 
+## JAA Consultants LLC is pleased to provide this Procrastination and Human Devlopment report requesed by our client at the United Nations Development Program.   The purpose of this report is to provide a clean data set and prelimiary insights into the data for the United Nations.  The client has provided JAA with a procrastination data set including many individual observations from many countries.   At the core of this data is insight into four different procrastination tests given to the individuals.  JAA was then asked to combine Human Development Index data with the provided data set, then clean, provide some preliminary visuals, and a recommendation on how to proceed with a larger study to better understand the links between procrastination and Human Development.  Human Development Index (HDI), age and income may be used to evaluate the emphasis that people and their capabilities should be the ultimate criteria for assessing the development of a country, not economic growth alone. 
 
-#Step 1: Data Profiling and Cleansing
+## This report is structured in the followin steps:  1.  Data Profiling, Consolidation, and Cleansing, 2. Data Scraping and Merging, 3. Data Screening and Initial Analysis/Visualization, 4. Recommendations 
+
+#Step 1: Data Profiling, Consolidation, and Cleansing
+## In this step JAA has conducted preliminary data exploration fromt the data provided (procrastination.csv) by the United Nations.  The data provided consists of 4,264 individual observations and 61 variables, all of which are fully explained in the Codebook.csv file provided as specified, in Asha Saxena's Github account. Of particular interest are the Countries involved and the procrastination scores from four studies.  The studies were: 1. Decisional Procrastination (DP) scale, 2. Adult Inventory of Procrastination (AIP) Scale, 3. General Procrastination (GP) scale, and 4. Satisfaction with Life Scale (SWLS)
+
+##The variables, or columns, were first renamed per specificaiton from the client and to simplify reading and working with the data.  Next the data was cleaned to remove non-sensical values, correct mis-spellings, numerical corrections, and a categorization of teaching and education related occupations of interest in future studies by the United Nations. To simplify the data and more quickly digest the DP, AIP, GP, and SWLS scores were represented as a mean for each.  Below is the associated code and ouptput necessary to visualize the state of the code.
 
 
 ```r
@@ -83,8 +88,6 @@ head(PD.renamed)
 ```
 
 
-## Data Consolidation and profiling continues: We combine occupation here specifically "teachers", label Male (1) and Female (2)
-
 ```r
 #2c. Some columns are, due to Qualtrics, malfunctioning. Prime examples are the following columns: “How long have you held this position?: Years”, Country of residence, Number of sons, and Current Occupation.
 
@@ -128,7 +131,6 @@ d[grepl("ducation", d, ignore.case=FALSE)] <- "Educator"
 PD.renamed$Occupation <- d
 ```
 
-## Calulations and Logic: creating new columns with mean calculations and rounding digits
 
 ```r
 #2e.  Each variable that starts with either DP, AIP, GP, or SWLS is an individual item on a scale. For example, DP 1 through DP 5 are five different questions on the Decision Procrastination Scale. I’ve reverse-scored them for you already, but you should create a new column for each of them with their mean. To clarify, you’ll need a DPMean column, an AIPMean column, a GPMean column, and a SWLSMean column. This represents the individual’s average decisional procrastination (DP), procrastination behavior (AIP), generalized procrastination (GP), and life satisfaction (SWLS).
@@ -151,7 +153,8 @@ head(PD.renamed[,62:65])
 ## 6    2.8   4.333   4.00      3.2
 ```
 
-#Step 2: Data Ingestion: Scraping the data from the specified to bring in the HDI metrics
+#Step 2:  Data Scraping and Merging
+## In order to compare country procrastination data to HDI, JAA then proceeded to scrape the HDI data from the website specified by the client (https://en.wikipedia.org/wiki/List_of_countries_by_Human_Development_Index#Complete_list_of_countries), which provided the HDI by country and a categorization based on the HDI value.  Below is the associated code, scraped country and ordered HDI table. 
 
 
 ```r
@@ -379,6 +382,7 @@ CountryHDI
 ## TODO need to fix "world" entry if teams decides it is necessary.
 ```
 
+##A minor adjustment was added to the table at the request of the client to add the HDI category as specified in the website.  The code and table is shown below.
 
 ```r
 #3b. Create a new column for this final scraped table which categories the Countries like the original page (Very high human development, High human development, Medium human development, Low human development). After these categories, output a csv file of this table to your repository.
@@ -587,7 +591,8 @@ CountryHDI
 write.csv(CountryHDI, file = "CountryHDI.csv") #Creates csv file
 ```
 
-### Data Merge: combining the two data sets so we can start the analysis
+#Step 3: Data Screening and Initial Analysis/Visualization
+##Next the data was merged in order to combinie the two data sets so that Data Screening and Initial Analysis/Visualization may be conducted.  Below is the merge code and also minor data cleaning so that the data could be merged based on the country variable in both data sets.
 
 
 ```r
@@ -647,7 +652,7 @@ head(MergedData)
 ## 6     3     5     4    yes       no    2.4   2.400    3.0      3.8
 ```
 
-## Data profiling and cleaning continues with looking for unique data elements such as unique and misspelled country's
+## During this step unique country names were discovered.  Several were listed as "NA" indicating that the country was simply not provided, or missing, in the data.   There were seveal country names that were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China).  This was merely a tool to confirm a valid data merge and may be seen below with the output of exceptions. 
 
 
 ```r
@@ -666,9 +671,9 @@ a
 ## [1] "Guam"       "PuertoRico" "Bermuda"    "Taiwan"     "Macao"     
 ## [6] "Yugoslavia" "Columbia"   NA
 ```
-#Comment:  The above coutry names were either not in the Procrastination set, Not listed (NA) or associated with another country (ie Taiwan/China)
 
-## Continue cleaning data by removing 18 and under and 80 and above members of the data set as we are looking for income, age and HDI score relation
+
+## Prior to further anlysis the data was filtered, per client direction, to remove 18 and under observations as well as elderly outliers 80 and above.  The code and age frequency tables (before and after) is shown below.
 
 
 ```r
@@ -760,7 +765,7 @@ AgeFreq #Verifies under 18 and 80 outlier is removed.
 ## 13    68   207
 ```
 
-#Step 2: Data Analysis: Descriptive Analysis with data visualization. 
+## Exploratory analysis continued with a high-level descriptive statistics table as specified by the client for Age, Income, HDI, and the four procrastination metrics (DP, AIP, GP, and SWLS).  In addition frequency graphs (histograms) were provided for age and income in order to begin to understand the observation sample demographics. 
 
 
 ```r
@@ -865,7 +870,7 @@ hist(dfTemp$AnnualIncome, ylim = c(0,800), main="Income Frequency Distribution",
 detach(dfTemp)
 ```
 
-## Data Analysis and visualization continues: we review the co-relation between Gender, Work Status, and Occupation
+## Next JAA determined additional demographic data specific to Gender count, Work Status, and Occupation.   This information could be useful in specifying further analysis and studies. 
 
 
 ```r
@@ -923,7 +928,7 @@ OccupationCount
 ## 10                     AccountsPayable     1
 ## # ... with 607 more rows
 ```
-## Data Analysis with visualization: narrowed to 15 countries as we start to find some answers here
+## Since the data may be influenced by a particular countries culture JAA has also provided a frequency count of observations, or participants in this study, by country.  As one can see, the United States is heavily represented in this study.
 
 
 ```r
@@ -962,7 +967,7 @@ attach(dfTempCounts)
 ## # ... with 71 more rows
 ```
 
-## Data Analysis continues with the procastination variable and how that affects other variables
+## The United Nations also asked JAA to determine how well individuals self-perceived their own procrastination by asking two question relating to their view and the view others.   When a person perceives themselves as being a procrastinator there is generally agreement based on the table below.   Whena  person does perceives themselves as being a procrastinator there is generally dis-agreement with others.  
 
 
 ```r
@@ -987,7 +992,7 @@ attach(dfTempCounts)
 ## 2         yes              2255
 ```
 
-## Further Analysis: we look at the procastination score for the top 15 nations in descending order 
+## The next two barcharts show that many of the same countries are represented as exhibiting the highest level of procrastination by either the AIP or DP scale.   This tells us that there may be culteral or HDI links. 
 
 
 ```r
@@ -1012,8 +1017,6 @@ scale_fill_brewer(palette= "Spectral") +
 
 ![](CS2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
-#Step 3: Data Visualization: Focusing on visualizing our data with the focus of three variabes DP, AIP and GP
-
 
 ```r
 #5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
@@ -1032,7 +1035,7 @@ ylab("DPMean") + ggtitle("Decisional Procrastination Scale (DP) Mean by Top 15 C
 
 ![](CS2_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
-#Step 4: Findings: Relationship between Age and Income
+##By further analysis we can see a trend where Male and Females start out early in life with similar salaries, but they become less similar with higher age. This may suggest furthers are needed to understan differences by country, HDI, and procrastination potential.
 
 
 ```r
@@ -1047,7 +1050,7 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
 
 ![](CS2_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
-##TODO RELABEL ALL CHARTS WITH MEANINGFULL TITLES.
+##  Additioanally, JAA looked at the Life Satisfaction index (SWLS) as it relates to HDI in both a scatter plot/linear trend method and also a barplot method.   As one can see there is a slight trend where life satisfaction increases with HDI and also there tends to be the majority of "Very High" HDI observations correlated wtih high Life Satisfaction as shown in the charts below.  
 
 ```r
 #5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
@@ -1073,6 +1076,7 @@ ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) +
 
 ![](CS2_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
+## Output files
 
 ```r
 #6 Outputting to CSV format – Make sure there are no index numbers (10%)
@@ -1122,3 +1126,7 @@ library(dplyr)
 Des.DP.ColsRemoved <- select(Des.DP, Country, CDPMean, HDI)
 write.csv(Des.DP.ColsRemoved, file = "Top15CountriesHDI.csv",row.names=FALSE)
 ```
+
+#Step 4. Recommendations
+## Based on the intial analyis and data exploration JAA has conluded that there are many relationships between HDI, Life Satisfaction, and Procrastination metrics that seem be be aligned by country and possibly culture.    JAA recommends, and would be happy to support in the following studies: 1.  Regression analysis of Procrastnation, Age, and HDI, to Income.  2. Conduct additional studies that link motivation and Gross Domestic Product, and 3. Income Gap Analysis by Country.
+
