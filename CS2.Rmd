@@ -220,7 +220,7 @@ GenderCount
 WorkStatusCount
 OccupationCount
 ```
-## Data Analysis with visualization: narrowed to 15 countries as we start to find some answers here
+## Since the data may be influenced by a particular countries culture JAA has also provided a frequency count of observations, or participants in this study, by country.  As one can see, the United States is heavily represented in this study.
 
 ```{r}
 #4d. Give the counts (again, pretty table) of how many participants per country in descending order.
@@ -233,7 +233,7 @@ attach(dfTempCounts)
   plyr::arrange(desc(Participant_Count))
 ```
 
-## Data Analysis continues with the procastination variable and how that affects other variables
+## The United Nations also asked JAA to determine how well individuals self-perceived their own procrastination by asking two question relating to their view and the view others.   When a person perceives themselves as being a procrastinator there is generally agreement based on the table below.   Whena  person does perceives themselves as being a procrastinator there is generally dis-agreement with others.  
 
 ```{r}
 #4e. There are two variables in the set: whether the person considers themselves a procrastinator (yes/no) and whether others consider them a procrastinator (yes/no). How many people matched their perceptions to others’ (so, yes/yes and no/no)? To clarify: how many people said they felt they were procrastinators and also said others thought they were procrastinators? Likewise, how many said they were not procrastinators and others also did not think they were procrastinators?
@@ -249,7 +249,7 @@ attach(dfTempCounts)
   rename(InAgreement = Q1Self)
 ```
 
-## Further Analysis: we look at the procastination score for the top 15 nations in descending order 
+## The next two barcharts show that many of the same countries are represented as exhibiting the highest level of procrastination by either the AIP or DP scale.   This tells us that there may be culteral or HDI links. 
 
 ```{r}
 #5b. Create a barchart in ggplot or similar which displays the top 15 nations in average procrastination scores, using one measure of the following: DP, AIP, or GP. The bars should be in descending order, with the number 1 most procrastinating nation at the top and 15th most procrastinating at the bottom. Omit all other nations. Color the bars by HDI category (see 3B). Use any color palette of your choice other than the default.
@@ -271,8 +271,6 @@ scale_fill_brewer(palette= "Spectral") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-#Step 3: Data Visualization: Focusing on visualizing our data with the focus of three variabes DP, AIP and GP
-
 ```{r}
 #5c. Create another barchart identical in features to 5B, but use another one of the three variables: DP, AIP, or GP. How many nations show up both in 5B’s plot and 5C’s? Which, if any?
 CountryDPMean <- summarize(ByCountry,CDPMean = mean(DPMean)) # Summarizes by country and finds mean of DP means of all observations, then assigns to dataframe
@@ -288,7 +286,7 @@ ylab("DPMean") + ggtitle("Decisional Procrastination Scale (DP) Mean by Top 15 C
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-#Step 4: Findings: Relationship between Age and Income
+##By further analysis we can see a trend where Male and Females start out early in life with similar salaries, but they become less similar with higher age. This may suggest furthers are needed to understan differences by country, HDI, and procrastination potential.
 
 ```{r}
 #5d. Is there a relationship between Age and Income? Create a scatterplot and make an assessment of whether there is a relationship. Color each point based on the Gender of the participant. You’re welcome to use lm() or similar functions to back up your claims.
@@ -300,7 +298,7 @@ ggplot(data=subset(MergedData.filt.b, !is.na(Gender)), aes(x = Age, y = AnnualIn
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-##TODO RELABEL ALL CHARTS WITH MEANINGFULL TITLES.
+##  Additioanally, JAA looked at the Life Satisfaction index (SWLS) as it relates to HDI in both a scatter plot/linear trend method and also a barplot method.   As one can see there is a slight trend where life satisfaction increases with HDI and also there tends to be the majority of "Very High" HDI observations correlated wtih high Life Satisfaction as shown in the charts below.  
 ```{r}
 #5e What about Life Satisfaction and HDI? Create another scatterplot. Is there a discernible relationship there? What about if you used the HDI category instead and made a barplot?
 
@@ -320,6 +318,7 @@ ggplot(MergedData.filt.b, aes(x = Category, y = SWLSMean)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+## Output files
 ```{r}
 #6 Outputting to CSV format – Make sure there are no index numbers (10%)
 #6a The client would like the finalized HDI table (3A and 3B)
@@ -343,3 +342,7 @@ library(dplyr)
 Des.DP.ColsRemoved <- select(Des.DP, Country, CDPMean, HDI)
 write.csv(Des.DP.ColsRemoved, file = "Top15CountriesHDI.csv",row.names=FALSE)
 ```
+
+#Step 4. Recommendations
+## Based on the intial analyis and data exploration JAA has conluded that there are many relationships between HDI, Life Satisfaction, and Procrastination metrics that seem be be aligned by country and possibly culture.    JAA recommends, and would be happy to support in the following studies: 1.  Regression analysis of Procrastnation, Age, and HDI, to Income.  2. Conduct additional studies that link motivation and Gross Domestic Product, and 3. Income Gap Analysis by Country.
+
